@@ -8,6 +8,7 @@
 const axios = require('axios');
 const { formatDateISO } = require('../utils/date');
 const MEALPLAN_ENDPOINTS = ['/api/groups/mealplans', '/api/households/mealplans'];
+const RECIPE_ENDPOINTS = ['/api/recipes', '/api/households/recipes'];
 
 /**
  * Creates a pre-configured axios instance for the Mealie API.
@@ -26,16 +27,18 @@ function createClient(config) {
 }
 
 /**
- * Performs a request against known meal plan endpoints and falls back on 404.
+ * Performs a request against fallback endpoint candidates for supported HTTP status codes.
  *
  * @param {import('axios').AxiosInstance} client
  * @param {'get'|'post'} method
+ * @param {string[]} endpoints
  * @param {object} options
+ * @param {number[]} [fallbackStatuses]
  * @returns {Promise<import('axios').AxiosResponse>}
  */
-async function requestMealPlan(client, method, options) {
+async function requestWithEndpointFallback(client, method, endpoints, options, fallbackStatuses = [404, 405]) {
   let lastError;
-  for (const endpoint of MEALPLAN_ENDPOINTS) {
+  for (const endpoint of endpoints) {
     try {
       const response = await client.request({
         method,
@@ -45,7 +48,7 @@ async function requestMealPlan(client, method, options) {
       return response;
     } catch (err) {
       err.mealieEndpoint = endpoint;
-      if (err.response?.status === 404) {
+      if (fallbackStatuses.includes(err.response?.status)) {
         lastError = err;
         continue;
       }
@@ -54,7 +57,7 @@ async function requestMealPlan(client, method, options) {
   }
 
   if (lastError) {
-    lastError.mealieEndpointCandidates = MEALPLAN_ENDPOINTS;
+    lastError.mealieEndpointCandidates = endpoints;
     throw lastError;
   }
 }
@@ -69,7 +72,7 @@ async function requestMealPlan(client, method, options) {
 async function getMealPlan(config, date) {
   const client = createClient(config);
   const dateStr = formatDateISO(date);
-  const response = await requestMealPlan(client, 'get', {
+  const response = await requestWithEndpointFallback(client, 'get', MEALPLAN_ENDPOINTS, {
     params: {
       start_date: dateStr,
       end_date: dateStr,
@@ -88,7 +91,7 @@ async function getMealPlan(config, date) {
  */
 async function searchRecipes(config, query) {
   const client = createClient(config);
-  const response = await client.get('/api/recipes', {
+  const response = await requestWithEndpointFallback(client, 'get', RECIPE_ENDPOINTS, {
     params: {
       search: query,
       perPage: 5,
@@ -120,7 +123,7 @@ async function createMealPlan(config, date, recipeId, title) {
   } else {
     body.title = title;
   }
-  const response = await requestMealPlan(client, 'post', { data: body });
+  const response = await requestWithEndpointFallback(client, 'post', MEALPLAN_ENDPOINTS, { data: body });
   return response.data;
 }
 

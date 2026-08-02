@@ -128,6 +128,10 @@ function buildUserErrorMessage(err) {
       const endpoint = err.mealieEndpoint || err.config?.url || 'unbekannt';
       return `Der Mealie-Endpunkt "${endpoint}" wurde nicht gefunden. Bitte prüfe Mealie-Version und Host-Einstellung.`;
     }
+    if (status === 405) {
+      const endpoint = err.mealieEndpoint || err.config?.url || 'unbekannt';
+      return `Der Mealie-Endpunkt "${endpoint}" unterstützt diese Aktion nicht. Bitte prüfe Mealie-Version und API-Endpunkte.`;
+    }
     return 'Mealie hat einen Fehler gemeldet. Bitte schau ins Add-On-Log für Details.';
   }
   const code = err.code || '';
