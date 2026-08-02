@@ -20,15 +20,37 @@ async function handleTurn({ state, config, request }) {
   }
 
   if (state.phase === 'awaiting_recipe_query') {
-    if (intentName !== 'MealPlanDialogRetryRecipe') {
+    const recipeQuery = extractBestSlotValue(slots, ['receipt', 'recipe', 'query']);
+    const actionFromRecipeQuery = normalizeAction(recipeQuery);
+    const explicitAction = actionFromRecipeQuery || (!recipeQuery ? resolveAction(intentName, slots) : null);
+
+    if (explicitAction === 'cancel') {
       return {
-        text: 'Bitte nenne das Rezept, das ich suchen soll, oder sage abbrechen.',
+        text: 'Okay, ich breche ab.',
+        endDialog: true,
+        shouldEndSession: true,
+      };
+    }
+
+    if (explicitAction === 'note') {
+      const date = new Date(state.dateIso);
+      const dateLabel = formatDateForSpeech(date);
+      await mealie.createMealPlan(config, date, null, state.originalQuery);
+      return {
+        text: `Ich habe "${state.originalQuery}" als Notiz für ${dateLabel} eingetragen.`,
+        endDialog: true,
+        shouldEndSession: true,
+      };
+    }
+
+    if (explicitAction === 'retry') {
+      return {
+        text: 'Welches Rezept soll ich stattdessen suchen?',
         endDialog: false,
         shouldEndSession: false,
       };
     }
 
-    const recipeQuery = slots.receipt?.value;
     if (!recipeQuery) {
       return {
         text: 'Ich habe den Rezeptnamen nicht verstanden. Bitte nenne ein anderes Rezept.',
@@ -60,15 +82,7 @@ async function handleTurn({ state, config, request }) {
     };
   }
 
-  if (intentName !== 'MealPlanDialogChoice') {
-    return {
-      text: 'Bitte sage: Notiz erstellen, anderes Rezept suchen oder abbrechen.',
-      endDialog: false,
-      shouldEndSession: false,
-    };
-  }
-
-  const action = normalizeAction(slots.choice?.value);
+  const action = resolveAction(intentName, slots);
   if (!action) {
     return {
       text: 'Bitte sage: Notiz erstellen, anderes Rezept suchen oder abbrechen.',
@@ -108,6 +122,45 @@ function normalizeAction(rawAction) {
   const value = (rawAction || '').toLowerCase().trim();
   if (!value) {
     return null;
+  }
+
+  function extractBestSlotValue(slots, preferredNames = []) {
+    for (const slotName of preferredNames) {
+      const value = slots?.[slotName]?.value;
+      if (typeof value === 'string' && value.trim()) {
+        return value.trim();
+      }
+    }
+
+    for (const slot of Object.values(slots || {})) {
+      const value = slot?.value;
+      if (typeof value === 'string' && value.trim()) {
+        return value.trim();
+      }
+    }
+
+    return null;
+  }
+
+  function resolveAction(intentName, slots) {
+    if (intentName === 'AMAZON.YesIntent') {
+      return 'retry';
+    }
+    if (intentName === 'AMAZON.NoIntent') {
+      return 'cancel';
+    }
+    if (intentName === 'MealPlanDialogRetryRecipe') {
+      return 'retry';
+    }
+
+    const choiceValue = slots.choice?.value;
+    const actionFromChoiceSlot = normalizeAction(choiceValue);
+    if (actionFromChoiceSlot) {
+      return actionFromChoiceSlot;
+    }
+
+    const anySlotValue = extractBestSlotValue(slots);
+    return normalizeAction(anySlotValue);
   }
   if (value.includes('abbruch') || value.includes('abbrechen') || value.includes('stopp')) {
     return 'cancel';

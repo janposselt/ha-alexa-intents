@@ -207,7 +207,13 @@
           "samples": [
             "{choice}",
             "Ich möchte {choice}",
-            "Bitte {choice}"
+            "Bitte {choice}",
+            "Notiz erstellen",
+            "Notiz anlegen",
+            "als Notiz speichern",
+            "anderes Rezept suchen",
+            "ein anderes Rezept suchen",
+            "abbrechen"
           ]
         },
         {
@@ -234,6 +240,8 @@
                 "value": "Notiz erstellen",
                 "synonyms": [
                   "Notiz",
+                  "Notiz anlegen",
+                  "Notiz machen",
                   "als Notiz",
                   "Notiz speichern"
                 ]
@@ -244,6 +252,9 @@
                 "value": "anderes Rezept suchen",
                 "synonyms": [
                   "anderes Rezept",
+                  "ein anderes Rezept",
+                  "suche anderes Rezept",
+                  "neues Rezept suchen",
                   "erneut suchen",
                   "neu suchen"
                 ]
