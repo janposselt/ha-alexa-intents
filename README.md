@@ -28,7 +28,7 @@ An Alexa custom skill forwards every `IntentRequest` to this service. The servic
 
 **Weekday rule:** `MealPlanForMonday` always refers to the *next* Monday. If today *is* Monday it resolves to next week Monday.
 
-**Dialog rule:** If no recipe is found while setting a meal, Alexa asks whether to create a note, search another recipe, or cancel.
+**Dialog rule:** If no recipe is found while setting a meal, Alexa asks whether to create a note, search another recipe, or cancel. If a recipe is found but the normalized name differs from the spoken query, Alexa asks for confirmation before using it.
 
 ---
 

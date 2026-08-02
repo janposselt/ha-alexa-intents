@@ -17,6 +17,7 @@
 
 const mealie = require('../services/mealie');
 const { getTargetDate, formatDateForSpeech } = require('../utils/date');
+const { isNormalizedExactRecipeMatch } = require('../utils/recipeMatch');
 const dialogManager = require('../dialogs/manager');
 const recipeNotFoundDialog = require('../dialogs/recipeNotFound');
 
@@ -38,14 +39,27 @@ async function handleMealPlanForDay(dayIdentifier, slots, config) {
 
   const searchResult = await mealie.searchRecipes(config, recipeQuery);
   const recipes = Array.isArray(searchResult?.items) ? searchResult.items : [];
+  const sessionId = config.__sessionId;
 
   if (recipes.length > 0) {
     const recipe = recipes[0];
+    const isExactMatch = isNormalizedExactRecipeMatch(recipeQuery, recipe.name);
+
+    if (!isExactMatch && sessionId) {
+      return dialogManager.startDialog(
+        sessionId,
+        recipeNotFoundDialog.TYPE,
+        recipeNotFoundDialog.buildInitialState(date, recipeQuery, {
+          id: recipe.id,
+          name: recipe.name,
+        }),
+      );
+    }
+
     await mealie.createMealPlan(config, date, recipe.id, null);
     return `Ich habe ${recipe.name} für ${dateLabel} eingetragen.`;
   }
 
-  const sessionId = config.__sessionId;
   if (!sessionId) {
     await mealie.createMealPlan(config, date, null, recipeQuery);
     return `Ich habe kein Rezept für "${recipeQuery}" gefunden und stattdessen eine Notiz für ${dateLabel} eingetragen.`;
