@@ -284,6 +284,34 @@ async function getRecipe(config, slug) {
   return response.data;
 }
 
+/**
+ * Creates a new recipe with optional ingredients in one operation.
+ *
+ * @param {object} config
+ * @param {string} name - Recipe name
+ * @param {string[]} [ingredients=[]] - Raw ingredient strings
+ * @returns {Promise<{ slug: string, recipeId: string|undefined }>}
+ */
+async function createRecipeWithIngredients(config, name, ingredients = []) {
+  const slug = await createRecipe(config, name);
+
+  let recipeId;
+  if (ingredients.length > 0) {
+    const parsedIngredients = await Promise.all(
+      ingredients.map((text) => parseIngredient(config, text)),
+    );
+    const updated = await updateRecipe(config, slug, { recipe_ingredient: parsedIngredients });
+    recipeId = updated?.id;
+  }
+
+  if (!recipeId) {
+    const full = await getRecipe(config, slug);
+    recipeId = full?.id;
+  }
+
+  return { slug, recipeId };
+}
+
 module.exports = {
   getMealPlan,
   searchRecipes,
@@ -294,4 +322,5 @@ module.exports = {
   updateRecipe,
   parseIngredient,
   getRecipe,
+  createRecipeWithIngredients,
 };

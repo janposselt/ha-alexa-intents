@@ -145,14 +145,7 @@ async function finishRecipe(state, config) {
   const { recipeName, ingredients = [] } = state;
 
   try {
-    const slug = await mealie.createRecipe(config, recipeName);
-
-    if (ingredients.length > 0) {
-      const parsedIngredients = await Promise.all(
-        ingredients.map((text) => mealie.parseIngredient(config, text)),
-      );
-      await mealie.updateRecipe(config, slug, { recipe_ingredient: parsedIngredients });
-    }
+    await mealie.createRecipeWithIngredients(config, recipeName, ingredients);
 
     const ingredientHint = ingredients.length > 0
       ? ` mit ${ingredients.length} Zutat${ingredients.length === 1 ? '' : 'en'}`

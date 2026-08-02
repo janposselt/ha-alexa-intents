@@ -11,6 +11,7 @@ const mealie = require('../services/mealie');
 const dialogManager = require('../dialogs/manager');
 const shoppingListReader = require('../dialogs/shoppingListReader');
 const { parseAlexaDateSlot } = require('../utils/mealPlan');
+const { formatDateISO } = require('../utils/date');
 
 /**
  * @param {Record<string, { value: string }>} slots
@@ -50,7 +51,7 @@ async function handleShoppingListRead(slots, config) {
     firstItemText = `Einkaufsliste ab ${weekday}. Am ${weekday} ist nichts eingetragen.`;
   } else {
     const fakeInitialState = {
-      dates: [],
+      dates: [formatDateISO(startDate)],
       dateIndex: 0,
       items: firstDayItems,
       itemIndex: -1,

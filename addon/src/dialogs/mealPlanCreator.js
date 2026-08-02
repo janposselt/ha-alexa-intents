@@ -373,21 +373,7 @@ async function createRecipeAndAddToDay(state, config) {
   const { newRecipeName, newRecipeIngredients = [] } = state;
 
   try {
-    const slug = await mealie.createRecipe(config, newRecipeName);
-
-    let recipeId;
-    if (newRecipeIngredients.length > 0) {
-      const parsedIngredients = await Promise.all(
-        newRecipeIngredients.map((text) => mealie.parseIngredient(config, text)),
-      );
-      const updated = await mealie.updateRecipe(config, slug, { recipe_ingredient: parsedIngredients });
-      recipeId = updated?.id;
-    }
-
-    if (!recipeId) {
-      const full = await mealie.getRecipe(config, slug);
-      recipeId = full?.id;
-    }
+    const { recipeId } = await mealie.createRecipeWithIngredients(config, newRecipeName, newRecipeIngredients);
 
     const ingredientHint = newRecipeIngredients.length > 0
       ? ` mit ${newRecipeIngredients.length} Zutat${newRecipeIngredients.length === 1 ? '' : 'en'}`
