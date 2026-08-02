@@ -10,10 +10,12 @@ const config = require('./config');
 const registry = require('./registry');
 const dialogManager = require('./dialogs/manager');
 const recipeNotFoundDialog = require('./dialogs/recipeNotFound');
+const createRecipeDialog = require('./dialogs/createRecipe');
 
 // Register all intent handlers
 require('./intents/index');
 dialogManager.registerDialogHandler(recipeNotFoundDialog.TYPE, recipeNotFoundDialog);
+dialogManager.registerDialogHandler(createRecipeDialog.TYPE, createRecipeDialog);
 
 const app = express();
 app.use(express.json());

@@ -62,6 +62,19 @@ async function continueDialogIfActive(body, config) {
 
   if (turn.endDialog) {
     activeDialogs.delete(sessionId);
+
+    // Chain to another dialog if requested
+    if (turn.chainDialog?.type) {
+      const chainHandler = handlers.get(turn.chainDialog.type);
+      if (chainHandler) {
+        const chainState = {
+          type: turn.chainDialog.type,
+          state: turn.chainDialog.state || {},
+          updatedAt: Date.now(),
+        };
+        activeDialogs.set(sessionId, chainState);
+      }
+    }
   } else {
     dialog.state = turn.state || dialog.state;
     activeDialogs.set(sessionId, dialog);

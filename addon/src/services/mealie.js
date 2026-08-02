@@ -185,10 +185,65 @@ async function deleteMealPlanForDate(config, date) {
   return { deletedCount, totalCount: items.length };
 }
 
+const PARSER_ENDPOINT = '/api/parser/ingredient';
+
+/**
+ * Creates a new recipe by name.
+ *
+ * @param {object} config
+ * @param {string} name - Recipe name
+ * @returns {Promise<string>} Slug of the created recipe
+ */
+async function createRecipe(config, name) {
+  const client = createClient(config);
+  const response = await requestWithEndpointFallback(client, 'post', RECIPE_ENDPOINTS, {
+    data: { name },
+  });
+  // Mealie returns the slug as a plain string
+  return typeof response.data === 'string' ? response.data : response.data?.slug ?? response.data;
+}
+
+/**
+ * Updates an existing recipe (e.g. to add ingredients).
+ *
+ * @param {object} config
+ * @param {string} slug
+ * @param {object} data - Partial recipe object to merge
+ * @returns {Promise<object>}
+ */
+async function updateRecipe(config, slug, data) {
+  const client = createClient(config);
+  const response = await client.put(`/api/recipes/${slug}`, data);
+  return response.data;
+}
+
+/**
+ * Parses a single ingredient string using the Mealie NLP parser.
+ * Falls back to a raw note object if the API is unavailable.
+ *
+ * @param {object} config
+ * @param {string} ingredientText
+ * @returns {Promise<object>} Parsed ingredient object suitable for PUT /api/recipes/{slug}
+ */
+async function parseIngredient(config, ingredientText) {
+  const client = createClient(config);
+  try {
+    const response = await client.post(PARSER_ENDPOINT, { ingredientText });
+    const parsed = response.data;
+    // Return the ingredient sub-object if it exists, otherwise the whole response
+    return parsed?.ingredient ?? parsed;
+  } catch {
+    return { note: ingredientText };
+  }
+}
+
 module.exports = {
   getMealPlan,
   searchRecipes,
   createMealPlan,
   deleteMealPlanEntry,
   deleteMealPlanForDate,
+  createRecipe,
+  updateRecipe,
+  parseIngredient,
 };

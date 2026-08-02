@@ -1,6 +1,7 @@
 const mealie = require('../services/mealie');
 const { formatDateISO, formatDateForSpeech } = require('../utils/date');
 const { isNormalizedExactRecipeMatch } = require('../utils/recipeMatch');
+const createRecipeDialog = require('./createRecipe');
 
 const TYPE = 'recipe-not-found';
 
@@ -8,7 +9,7 @@ function getPrompt(state = {}) {
   if (state.phase === 'awaiting_recipe_confirmation' && state.pendingRecipeName) {
     return `Ich habe ${state.pendingRecipeName} gefunden. Soll ich das verwenden?`;
   }
-  return 'Ich habe kein passendes Rezept gefunden. Möchtest du stattdessen eine Notiz erstellen, ein anderes Rezept suchen oder abbrechen?';
+  return 'Ich habe kein passendes Rezept gefunden. Möchtest du stattdessen eine Notiz erstellen, ein anderes Rezept suchen, ein neues Rezept erstellen oder abbrechen?';
 }
 
 async function handleTurn({ state, config, request }) {
@@ -97,6 +98,19 @@ async function handleTurn({ state, config, request }) {
       };
     }
 
+    if (explicitAction === 'create') {
+      const recipeName = state.originalQuery;
+      return {
+        text: `Okay, wir erstellen "${recipeName}". Nenne die erste Zutat. Sage "Fertig" wenn du alle Zutaten genannt hast.`,
+        endDialog: true,
+        chainDialog: {
+          type: createRecipeDialog.TYPE,
+          state: createRecipeDialog.buildInitialState({ recipeName }),
+        },
+        shouldEndSession: false,
+      };
+    }
+
     if (!recipeQuery) {
       return {
         text: 'Ich habe den Rezeptnamen nicht verstanden. Bitte nenne ein anderes Rezept.',
@@ -134,7 +148,7 @@ async function handleTurn({ state, config, request }) {
     }
 
     return {
-      text: 'Ich habe wieder kein passendes Rezept gefunden. Möchtest du eine Notiz erstellen, ein anderes Rezept suchen oder abbrechen?',
+      text: 'Ich habe wieder kein passendes Rezept gefunden. Möchtest du eine Notiz erstellen, ein anderes Rezept suchen, ein neues Rezept erstellen oder abbrechen?',
       state: { ...state, phase: 'awaiting_choice' },
       endDialog: false,
       shouldEndSession: false,
@@ -144,7 +158,7 @@ async function handleTurn({ state, config, request }) {
   const action = resolveAction(intentName, slots);
   if (!action) {
     return {
-      text: 'Bitte sage: Notiz erstellen, anderes Rezept suchen oder abbrechen.',
+      text: 'Bitte sage: Notiz erstellen, anderes Rezept suchen, neues Rezept erstellen oder abbrechen.',
       endDialog: false,
       shouldEndSession: false,
     };
@@ -163,6 +177,19 @@ async function handleTurn({ state, config, request }) {
       text: 'Welches Rezept soll ich stattdessen suchen?',
       state: { ...state, phase: 'awaiting_recipe_query' },
       endDialog: false,
+      shouldEndSession: false,
+    };
+  }
+
+  if (action === 'create') {
+    const recipeName = state.originalQuery;
+    return {
+      text: `Okay, wir erstellen "${recipeName}". Nenne die erste Zutat. Sage "Fertig" wenn du alle Zutaten genannt hast.`,
+      endDialog: true,
+      chainDialog: {
+        type: createRecipeDialog.TYPE,
+        state: createRecipeDialog.buildInitialState({ recipeName }),
+      },
       shouldEndSession: false,
     };
   }
@@ -188,6 +215,9 @@ function normalizeAction(rawAction, options = {}) {
   }
   if (value.includes('notiz')) {
     return 'note';
+  }
+  if (value.includes('neues rezept') || value.includes('rezept erstellen') || value.includes('rezept anlegen')) {
+    return 'create';
   }
   if (value.includes('anderes rezept') || value.includes('erneut suchen') || value.includes('neu suchen')) {
     return 'retry';

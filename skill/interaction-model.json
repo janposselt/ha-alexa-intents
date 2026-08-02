@@ -213,6 +213,15 @@
             "als Notiz speichern",
             "anderes Rezept suchen",
             "ein anderes Rezept suchen",
+            "neues Rezept erstellen",
+            "ein neues Rezept erstellen",
+            "Rezept erstellen",
+            "Rezept anlegen",
+            "Fertig",
+            "Ich bin fertig",
+            "Das wars",
+            "korrigieren",
+            "letzte Zutat korrigieren",
             "abbrechen"
           ]
         },
@@ -228,6 +237,17 @@
             "Suche {receipt}",
             "Nimm {receipt}",
             "Suche nach {receipt}"
+          ]
+        },
+        {
+          "name": "CreateRecipe",
+          "samples": [
+            "Rezept erstellen",
+            "Neues Rezept anlegen",
+            "Lege ein neues Rezept an",
+            "Erstelle ein Rezept",
+            "Erstelle ein neues Rezept",
+            "Neues Rezept erstellen"
           ]
         }
       ],
@@ -257,6 +277,40 @@
                   "neues Rezept suchen",
                   "erneut suchen",
                   "neu suchen"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "neues Rezept erstellen",
+                "synonyms": [
+                  "Rezept erstellen",
+                  "Rezept anlegen",
+                  "neues Rezept anlegen",
+                  "ein neues Rezept erstellen"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Fertig",
+                "synonyms": [
+                  "bin fertig",
+                  "ich bin fertig",
+                  "das wars",
+                  "fertig mit Zutaten",
+                  "keine weiteren Zutaten"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "korrigieren",
+                "synonyms": [
+                  "letzte Zutat korrigieren",
+                  "letzte Eingabe korrigieren",
+                  "rückgängig",
+                  "letzte Zutat entfernen"
                 ]
               }
             },
