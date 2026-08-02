@@ -213,7 +213,7 @@ async function createRecipe(config, name) {
  */
 async function updateRecipe(config, slug, data) {
   const client = createClient(config);
-  const response = await client.put(`/api/recipes/${slug}`, data);
+  const response = await client.patch(`/api/recipes/${slug}`, data);
   return response.data;
 }
 
@@ -228,12 +228,15 @@ async function updateRecipe(config, slug, data) {
 async function parseIngredient(config, ingredientText) {
   const client = createClient(config);
   try {
-    const response = await client.post(PARSER_ENDPOINT, { ingredientText });
+    const response = await client.post(PARSER_ENDPOINT, { ingredient: ingredientText });
     const parsed = response.data;
     // Return the ingredient sub-object if it exists, otherwise the whole response
     return parsed?.ingredient ?? parsed;
   } catch {
-    return { note: ingredientText };
+    return {
+      note: ingredientText,
+      original_text: ingredientText,
+    };
   }
 }
 

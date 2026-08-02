@@ -38,4 +38,5 @@ registry.register('MealPlanDelete', handleMealPlanDelete);
 registry.register('MealPlanNextDays', handleMealPlanNextDays);
 registry.register('MealPlanDialogChoice', handleMealPlanDialogWithoutActiveSession);
 registry.register('MealPlanDialogRetryRecipe', handleMealPlanDialogWithoutActiveSession);
+registry.register('DialogTextInput', handleMealPlanDialogWithoutActiveSession);
 registry.register('CreateRecipe', handleCreateRecipe);

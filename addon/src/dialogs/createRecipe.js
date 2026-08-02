@@ -151,7 +151,7 @@ async function finishRecipe(state, config) {
       const parsedIngredients = await Promise.all(
         ingredients.map((text) => mealie.parseIngredient(config, text)),
       );
-      await mealie.updateRecipe(config, slug, { ingredients: parsedIngredients });
+      await mealie.updateRecipe(config, slug, { recipe_ingredient: parsedIngredients });
     }
 
     const ingredientHint = ingredients.length > 0
@@ -211,7 +211,7 @@ function getResolvedSlotValue(slot) {
 
 function extractInputText(slots) {
   // Preferred slot names for recipe/ingredient text input
-  const preferred = ['receipt', 'recipe', 'query', 'choice'];
+  const preferred = ['query', 'receipt', 'recipe', 'choice'];
   for (const name of preferred) {
     // Prefer canonical resolved value over spoken value for custom-type slots
     const canonical = getResolvedSlotValue(slots?.[name]);

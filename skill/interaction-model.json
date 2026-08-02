@@ -240,6 +240,19 @@
           ]
         },
         {
+          "name": "DialogTextInput",
+          "slots": [
+            {
+              "name": "query",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "{query}",
+            "bitte {query}"
+          ]
+        },
+        {
           "name": "CreateRecipe",
           "samples": [
             "Lege ein neues Rezept in Mealie an",
