@@ -1,0 +1,163 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "mein essensplaner",
+      "intents": [
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "MealPlanned",
+          "slots": [
+            {
+              "name": "date",
+              "type": "AMAZON.DATE"
+            }
+          ],
+          "samples": [
+            "Was gibt es am {date}",
+            "Was steht am {date} auf dem Essensplan",
+            "Was ist für {date} geplant",
+            "Was essen wir am {date}",
+            "Zeig mir den Essensplan für {date}"
+          ]
+        },
+        {
+          "name": "MealPlanForToday",
+          "slots": [
+            {
+              "name": "receipt",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "Trage {receipt} für heute ein",
+            "Heute gibt es {receipt}",
+            "Setze heute {receipt}"
+          ]
+        },
+        {
+          "name": "MealPlanForTomorrow",
+          "slots": [
+            {
+              "name": "receipt",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "Trage {receipt} für morgen ein",
+            "Morgen gibt es {receipt}",
+            "Setze morgen {receipt}"
+          ]
+        },
+        {
+          "name": "MealPlanForMonday",
+          "slots": [
+            {
+              "name": "receipt",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "Trage {receipt} für Montag ein",
+            "Am Montag gibt es {receipt}",
+            "Setze Montag {receipt}"
+          ]
+        },
+        {
+          "name": "MealPlanForTuesday",
+          "slots": [
+            {
+              "name": "receipt",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "Trage {receipt} für Dienstag ein",
+            "Am Dienstag gibt es {receipt}",
+            "Setze Dienstag {receipt}"
+          ]
+        },
+        {
+          "name": "MealPlanForWednesday",
+          "slots": [
+            {
+              "name": "receipt",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "Trage {receipt} für Mittwoch ein",
+            "Am Mittwoch gibt es {receipt}",
+            "Setze Mittwoch {receipt}"
+          ]
+        },
+        {
+          "name": "MealPlanForThursday",
+          "slots": [
+            {
+              "name": "receipt",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "Trage {receipt} für Donnerstag ein",
+            "Am Donnerstag gibt es {receipt}",
+            "Setze Donnerstag {receipt}"
+          ]
+        },
+        {
+          "name": "MealPlanForFriday",
+          "slots": [
+            {
+              "name": "receipt",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "Trage {receipt} für Freitag ein",
+            "Am Freitag gibt es {receipt}",
+            "Setze Freitag {receipt}"
+          ]
+        },
+        {
+          "name": "MealPlanForSaturday",
+          "slots": [
+            {
+              "name": "receipt",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "Trage {receipt} für Samstag ein",
+            "Am Samstag gibt es {receipt}",
+            "Setze Samstag {receipt}"
+          ]
+        },
+        {
+          "name": "MealPlanForSunday",
+          "slots": [
+            {
+              "name": "receipt",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "Trage {receipt} für Sonntag ein",
+            "Am Sonntag gibt es {receipt}",
+            "Setze Sonntag {receipt}"
+          ]
+        }
+      ]
+    }
+  }
+}
