@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "mein essensplaner",
+      "invocationName": "ein orakel",
       "intents": [
         {
           "name": "AMAZON.StopIntent",
@@ -24,11 +24,14 @@
             }
           ],
           "samples": [
-            "Was gibt es am {date}",
-            "Was steht am {date} auf dem Essensplan",
+            "Was gibt es {date}",
+            "Was steht {date} auf dem Essensplan",
             "Was ist für {date} geplant",
-            "Was essen wir am {date}",
-            "Zeig mir den Essensplan für {date}"
+            "Was essen wir {date}",
+            "Zeig mir den Essensplan für {date}",
+            "Was es {date} zu essen gibt",
+            "Was es {date} zu essen geplant ist",
+            "Was wir {date} essen"
           ]
         },
         {

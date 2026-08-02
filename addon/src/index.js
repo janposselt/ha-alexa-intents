@@ -68,7 +68,7 @@ app.post('/alexa', async (req, res) => {
   }
 
   if (requestType === 'LaunchRequest') {
-    return res.json(buildResponse('Willkommen bei Home Assistant Alexa Intents. Wie kann ich helfen?'));
+    return res.json(buildResponse('Willkommen bei Home Assistant Alexa Intents. Wie kann ich helfen?', false));
   }
 
   if (requestType === 'SessionEndedRequest') {
