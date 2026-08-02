@@ -187,10 +187,10 @@ async function loadDay(state, config, targetDateIndex) {
 // ── Ingredient helpers ─────────────────────────────────────────────────────────
 
 function extractIngredients(recipe) {
-  if (!Array.isArray(recipe?.recipe_ingredient)) {
+  if (!Array.isArray(recipe?.recipeIngredient)) {
     return [];
   }
-  return recipe.recipe_ingredient.filter((ing) => {
+  return recipe.recipeIngredient.filter((ing) => {
     const text = getIngredientText(ing);
     return text && text !== 'Zutat';
   });
