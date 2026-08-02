@@ -242,12 +242,12 @@
         {
           "name": "CreateRecipe",
           "samples": [
-            "Rezept erstellen",
+            "Lege ein neues Rezept in Mealie an",
+            "Erstelle ein neues Rezept in Mealie",
+            "Neues Rezept in Mealie anlegen",
             "Neues Rezept anlegen",
             "Lege ein neues Rezept an",
-            "Erstelle ein Rezept",
-            "Erstelle ein neues Rezept",
-            "Neues Rezept erstellen"
+            "Erstelle ein Rezept"
           ]
         }
       ],

@@ -177,22 +177,48 @@ function normalizeAction(text) {
   if (!value) {
     return null;
   }
-  if (value === 'fertig' || value.startsWith('fertig ') || value === 'das wars' || value === 'bin fertig') {
+  if (value === 'fertig' || value.startsWith('fertig ') || value === 'das wars' || value === 'bin fertig' || value === 'ich bin fertig' || value.includes('keine weiteren zutaten') || value.includes('fertig mit zutaten')) {
     return 'done';
   }
   if (value.includes('abbruch') || value.includes('abbrechen') || value.includes('stopp') || value === 'stop') {
     return 'cancel';
   }
-  if (value.includes('korrigier') || value.includes('rückgängig') || value === 'undo') {
+  if (value.includes('korrigier') || value.includes('rückgängig') || value === 'undo' || value.includes('letzte zutat') || value.includes('letzte eingabe')) {
     return 'correct';
   }
   return null;
 }
 
+/**
+ * Returns the canonical resolved value for a slot when Alexa matched it to
+ * a custom slot type value (ER_SUCCESS_MATCH). Falls back to null otherwise.
+ *
+ * @param {object} slot - Alexa slot object (may be undefined)
+ * @returns {string|null}
+ */
+function getResolvedSlotValue(slot) {
+  const authorities = slot?.resolutions?.resolutionsPerAuthority;
+  if (!Array.isArray(authorities)) {
+    return null;
+  }
+  for (const authority of authorities) {
+    if (authority?.status?.code === 'ER_SUCCESS_MATCH') {
+      return authority.values?.[0]?.value?.name ?? null;
+    }
+  }
+  return null;
+}
+
 function extractInputText(slots) {
-  // Prefer the receipt/recipe SearchQuery slot, then any slot
+  // Preferred slot names for recipe/ingredient text input
   const preferred = ['receipt', 'recipe', 'query', 'choice'];
   for (const name of preferred) {
+    // Prefer canonical resolved value over spoken value for custom-type slots
+    const canonical = getResolvedSlotValue(slots?.[name]);
+    if (canonical && !normalizeAction(canonical)) {
+      // Only use canonical if it doesn't look like a dialog command
+      return canonical;
+    }
     const value = slots?.[name]?.value;
     if (typeof value === 'string' && value.trim()) {
       return value.trim();

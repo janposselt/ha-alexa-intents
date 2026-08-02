@@ -210,20 +210,47 @@ function normalizeAction(rawAction, options = {}) {
   if (!value) {
     return null;
   }
-  if (value.includes('abbruch') || value.includes('abbrechen') || value.includes('stopp')) {
+  if (value.includes('abbruch') || value.includes('abbrechen') || value.includes('stopp') || value === 'stop') {
     return 'cancel';
   }
   if (value.includes('notiz')) {
     return 'note';
   }
-  if (value.includes('neues rezept') || value.includes('rezept erstellen') || value.includes('rezept anlegen')) {
-    return 'create';
-  }
-  if (value.includes('anderes rezept') || value.includes('erneut suchen') || value.includes('neu suchen')) {
+  // Check retry BEFORE create so "neues Rezept suchen" is not mis-classified as 'create'.
+  if (
+    value.includes('anderes rezept')
+    || value.includes('erneut suchen')
+    || value.includes('neu suchen')
+    || (value.includes('neues rezept') && value.includes('such'))
+  ) {
     return 'retry';
   }
   if (!strict && value.includes('ander') && value.includes('rezept')) {
     return 'retry';
+  }
+  if (value.includes('neues rezept') || value.includes('rezept erstellen') || value.includes('rezept anlegen')) {
+    return 'create';
+  }
+  return null;
+}
+
+/**
+ * Returns the canonical resolved value for a slot when Alexa matched it to
+ * a custom slot type value (ER_SUCCESS_MATCH). Falls back to null when the
+ * slot has no resolution or the resolution did not match.
+ *
+ * @param {object} slot - Alexa slot object (may be undefined)
+ * @returns {string|null}
+ */
+function getResolvedSlotValue(slot) {
+  const authorities = slot?.resolutions?.resolutionsPerAuthority;
+  if (!Array.isArray(authorities)) {
+    return null;
+  }
+  for (const authority of authorities) {
+    if (authority?.status?.code === 'ER_SUCCESS_MATCH') {
+      return authority.values?.[0]?.value?.name ?? null;
+    }
   }
   return null;
 }
@@ -247,10 +274,22 @@ function extractBestSlotValue(slots, preferredNames = []) {
 }
 
 function resolveAction(intentName, slots) {
-  const choiceValue = slots.choice?.value;
-  const actionFromChoiceSlot = normalizeAction(choiceValue);
-  if (actionFromChoiceSlot) {
-    return actionFromChoiceSlot;
+  // Map specific intent names directly to actions before inspecting slots.
+  // This handles cases where Alexa routes a user utterance (e.g. "Rezept erstellen")
+  // to a dedicated intent instead of MealPlanDialogChoice.
+  if (intentName === 'CreateRecipe') {
+    return 'create';
+  }
+
+  // For the choice slot, prefer the resolved canonical value (from Alexa's slot
+  // resolution against MEALPLAN_DIALOG_ACTION) over the raw spoken value, because
+  // Alexa normalises synonyms to the canonical form in resolutions even when the
+  // spoken word doesn't match our keyword patterns.
+  const choiceCanonical = getResolvedSlotValue(slots.choice);
+  const choiceSpoken = slots.choice?.value;
+  const actionFromChoice = normalizeAction(choiceCanonical) || normalizeAction(choiceSpoken);
+  if (actionFromChoice) {
+    return actionFromChoice;
   }
 
   const anySlotValue = extractBestSlotValue(slots);
@@ -276,7 +315,9 @@ function resolveConfirmationAction(intentName, slots) {
     return 'no';
   }
 
-  const value = extractBestSlotValue(slots, ['choice', 'receipt', 'recipe', 'query']);
+  // Check canonical resolved value first, then spoken value
+  const choiceCanonical = getResolvedSlotValue(slots.choice);
+  const value = choiceCanonical || extractBestSlotValue(slots, ['choice', 'receipt', 'recipe', 'query']);
   const normalized = (value || '').toLowerCase().trim();
   if (!normalized) {
     return null;
