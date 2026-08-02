@@ -142,6 +142,38 @@
             "Lege ein neues Rezept an",
             "Erstelle ein Rezept"
           ]
+        },
+        {
+          "name": "MealPlanCreate",
+          "slots": [
+            {
+              "name": "date",
+              "type": "AMAZON.DATE"
+            }
+          ],
+          "samples": [
+            "Erstelle mir einen Essensplan ab {date}",
+            "Plane den Essensplan ab {date}",
+            "Neuer Essensplan ab {date}",
+            "Essensplan erstellen ab {date}",
+            "Starte die Essensplanung ab {date}"
+          ]
+        },
+        {
+          "name": "ShoppingListRead",
+          "slots": [
+            {
+              "name": "date",
+              "type": "AMAZON.DATE"
+            }
+          ],
+          "samples": [
+            "Lese mir die Einkaufsliste ab {date} vor",
+            "Lies die Einkaufsliste ab {date} vor",
+            "Einkaufsliste ab {date} vorlesen",
+            "Was brauche ich ab {date}",
+            "Zutaten ab {date} vorlesen"
+          ]
         }
       ],
       "types": [
@@ -214,6 +246,59 @@
                   "Abbruch",
                   "stop",
                   "stopp"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "weiter",
+                "synonyms": [
+                  "nächster Tag",
+                  "nächste",
+                  "ok",
+                  "okay",
+                  "bestätigen"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "überspringen",
+                "synonyms": [
+                  "diesen Tag überspringen",
+                  "Tag überspringen",
+                  "skip"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "ersetzen",
+                "synonyms": [
+                  "ersetzen und neu eingeben",
+                  "löschen und neu",
+                  "ändern"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "hinzufügen",
+                "synonyms": [
+                  "behalten und hinzufügen",
+                  "noch etwas hinzufügen",
+                  "weiteres Gericht hinzufügen"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "speichern",
+                "synonyms": [
+                  "beenden und speichern",
+                  "Essensplanung beenden",
+                  "Essensplan speichern",
+                  "Plan speichern"
                 ]
               }
             }
