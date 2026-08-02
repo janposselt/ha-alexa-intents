@@ -244,7 +244,7 @@
           "slots": [
             {
               "name": "query",
-              "type": "AMAZON.SearchQuery"
+              "type": "DIALOG_TEXT_INPUT"
             }
           ],
           "samples": [
@@ -335,6 +335,71 @@
                   "stop",
                   "stopp"
                 ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DIALOG_TEXT_INPUT",
+          "values": [
+            {
+              "name": {
+                "value": "Pommes mit Bratrolle"
+              }
+            },
+            {
+              "name": {
+                "value": "2 Bratrollen"
+              }
+            },
+            {
+              "name": {
+                "value": "750 Gramm Pommes"
+              }
+            },
+            {
+              "name": {
+                "value": "Spaghetti Carbonara"
+              }
+            },
+            {
+              "name": {
+                "value": "1 Zwiebel"
+              }
+            },
+            {
+              "name": {
+                "value": "200 Milliliter Sahne"
+              }
+            },
+            {
+              "name": {
+                "value": "Kartoffelsalat"
+              }
+            },
+            {
+              "name": {
+                "value": "3 Eier"
+              }
+            },
+            {
+              "name": {
+                "value": "rote Paprika"
+              }
+            },
+            {
+              "name": {
+                "value": "frische Petersilie"
+              }
+            },
+            {
+              "name": {
+                "value": "Lasagne"
+              }
+            },
+            {
+              "name": {
+                "value": "eine Packung Nudeln"
               }
             }
           ]
