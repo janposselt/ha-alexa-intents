@@ -52,29 +52,6 @@ async function requestWithEndpointFallback(client, method, endpoints, options, f
         lastError = err;
         continue;
       }
-
-      /**
-       * Performs a request against fallback endpoint candidates with an item ID suffix.
-       *
-       * @param {import('axios').AxiosInstance} client
-       * @param {'delete'} method
-       * @param {string[]} endpoints
-       * @param {string} itemId
-       * @param {object} options
-       * @param {number[]} [fallbackStatuses]
-       * @returns {Promise<import('axios').AxiosResponse>}
-       */
-      async function requestWithEndpointIdFallback(
-        client,
-        method,
-        endpoints,
-        itemId,
-        options = {},
-        fallbackStatuses = [404, 405],
-      ) {
-        const withId = endpoints.map((endpoint) => `${endpoint}/${itemId}`);
-        return requestWithEndpointFallback(client, method, withId, options, fallbackStatuses);
-      }
       throw err;
     }
   }
@@ -83,6 +60,29 @@ async function requestWithEndpointFallback(client, method, endpoints, options, f
     lastError.mealieEndpointCandidates = endpoints;
     throw lastError;
   }
+}
+
+/**
+ * Performs a request against fallback endpoint candidates with an item ID suffix.
+ *
+ * @param {import('axios').AxiosInstance} client
+ * @param {'delete'} method
+ * @param {string[]} endpoints
+ * @param {string} itemId
+ * @param {object} options
+ * @param {number[]} [fallbackStatuses]
+ * @returns {Promise<import('axios').AxiosResponse>}
+ */
+async function requestWithEndpointIdFallback(
+  client,
+  method,
+  endpoints,
+  itemId,
+  options = {},
+  fallbackStatuses = [404, 405],
+) {
+  const withId = endpoints.map((endpoint) => `${endpoint}/${itemId}`);
+  return requestWithEndpointFallback(client, method, withId, options, fallbackStatuses);
 }
 
 /**

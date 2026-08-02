@@ -154,6 +154,18 @@ function extractBestSlotValue(slots, preferredNames = []) {
 }
 
 function resolveAction(intentName, slots) {
+  const choiceValue = slots.choice?.value;
+  const actionFromChoiceSlot = normalizeAction(choiceValue);
+  if (actionFromChoiceSlot) {
+    return actionFromChoiceSlot;
+  }
+
+  const anySlotValue = extractBestSlotValue(slots);
+  const actionFromAnySlot = normalizeAction(anySlotValue);
+  if (actionFromAnySlot) {
+    return actionFromAnySlot;
+  }
+
   if (intentName === 'AMAZON.YesIntent') {
     return 'retry';
   }
@@ -164,14 +176,7 @@ function resolveAction(intentName, slots) {
     return 'retry';
   }
 
-  const choiceValue = slots.choice?.value;
-  const actionFromChoiceSlot = normalizeAction(choiceValue);
-  if (actionFromChoiceSlot) {
-    return actionFromChoiceSlot;
-  }
-
-  const anySlotValue = extractBestSlotValue(slots);
-  return normalizeAction(anySlotValue);
+  return null;
 }
 
 function buildInitialState(date, originalQuery) {
