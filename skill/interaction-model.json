@@ -227,7 +227,7 @@
           "samples": [
             "Suche {receipt}",
             "Nimm {receipt}",
-            "{receipt}"
+            "Suche nach {receipt}"
           ]
         }
       ],
