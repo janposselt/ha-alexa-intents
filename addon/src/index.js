@@ -1,0 +1,198 @@
+/**
+ * HA Alexa Intents – Main entry point.
+ *
+ * Starts an Express HTTP server that accepts POST /alexa requests from a
+ * generic Alexa custom skill and routes them to registered intent handlers.
+ */
+
+const express = require('express');
+const config = require('./config');
+const registry = require('./registry');
+const dialogManager = require('./dialogs/manager');
+const recipeNotFoundDialog = require('./dialogs/recipeNotFound');
+const createRecipeDialog = require('./dialogs/createRecipe');
+const mealPlanCreatorDialog = require('./dialogs/mealPlanCreator');
+const shoppingListReaderDialog = require('./dialogs/shoppingListReader');
+
+// Register all intent handlers
+require('./intents/index');
+dialogManager.registerDialogHandler(recipeNotFoundDialog.TYPE, recipeNotFoundDialog);
+dialogManager.registerDialogHandler(createRecipeDialog.TYPE, createRecipeDialog);
+dialogManager.registerDialogHandler(mealPlanCreatorDialog.TYPE, mealPlanCreatorDialog);
+dialogManager.registerDialogHandler(shoppingListReaderDialog.TYPE, shoppingListReaderDialog);
+
+const app = express();
+app.use(express.json());
+
+// ── Health check ───────────────────────────────────────────────────────────────
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', port, uptime: Math.round(process.uptime()), intents: registry.list() });
+});
+
+app.get('/', (_req, res) => {
+  const startTime = new Date(Date.now() - Math.round(process.uptime() * 1000));
+  const intentList = registry.list().map(n => `<li><code>${n}</code></li>`).join('\n    ');
+  const html = `<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HA Alexa Intents</title>
+  <style>
+    body { font-family: sans-serif; max-width: 680px; margin: 40px auto; padding: 0 20px; color: #333; }
+    h1 { color: #1a73e8; }
+    .badge { display: inline-block; background: #34a853; color: #fff; padding: 4px 12px; border-radius: 12px; font-weight: bold; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1em; }
+    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #e0e0e0; }
+    th { background: #f5f5f5; }
+    code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <h1>HA Alexa Intents</h1>
+  <p><span class="badge">&#10003; Running</span></p>
+  <table>
+    <tr><th>Port</th><td><code>${port}</code></td></tr>
+    <tr><th>Started</th><td>${startTime.toLocaleString('de-DE')}</td></tr>
+    <tr><th>Uptime</th><td>${Math.round(process.uptime())} s</td></tr>
+    <tr><th>Alexa Endpoint</th><td><code>POST /alexa</code></td></tr>
+    <tr><th>Health (JSON)</th><td><a href="/health"><code>/health</code></a></td></tr>
+  </table>
+  <h2>Registrierte Intents</h2>
+  <ul>
+    ${intentList}
+  </ul>
+</body>
+</html>`;
+  res.type('html').send(html);
+});
+
+// ── Alexa request handler ──────────────────────────────────────────────────────
+app.post('/alexa', async (req, res) => {
+  const body = req.body;
+  const requestType = body?.request?.type;
+
+  if (!requestType) {
+    return res.status(400).json({ error: 'Missing request type' });
+  }
+
+  if (requestType === 'LaunchRequest') {
+    return res.json(buildResponse('Willkommen bei Home Assistant Alexa Intents. Wie kann ich helfen?', false));
+  }
+
+  if (requestType === 'SessionEndedRequest') {
+    dialogManager.clearDialog(body?.session?.sessionId);
+    return res.json({ version: '1.0', response: {} });
+  }
+
+  if (requestType === 'IntentRequest') {
+    const dialogTurn = await dialogManager.continueDialogIfActive(body, config);
+    if (dialogTurn) {
+      return res.json(buildResponse(dialogTurn.text, dialogTurn.shouldEndSession));
+    }
+
+    const intentName = body.request.intent?.name;
+    const slots = body.request.intent?.slots || {};
+    const requestConfig = {
+      ...config,
+      __sessionId: body?.session?.sessionId || null,
+    };
+
+    // Built-in stop / cancel intents
+    if (intentName === 'AMAZON.StopIntent' || intentName === 'AMAZON.CancelIntent') {
+      return res.json(buildResponse('Auf Wiedersehen!'));
+    }
+
+    const handler = registry.get(intentName);
+    if (!handler) {
+      console.warn(`[alexa] No handler registered for intent: ${intentName}`);
+      return res.json(buildResponse(`Der Intent "${intentName}" ist nicht registriert.`));
+    }
+
+    try {
+      const handlerResult = await handler(slots, requestConfig);
+      if (typeof handlerResult === 'string') {
+        return res.json(buildResponse(handlerResult));
+      }
+
+      if (handlerResult && typeof handlerResult === 'object' && typeof handlerResult.text === 'string') {
+        return res.json(buildResponse(handlerResult.text, handlerResult.shouldEndSession ?? true));
+      }
+
+      return res.json(buildResponse('Es ist ein unerwarteter Fehler aufgetreten.'));
+    } catch (err) {
+      // Log full details so the add-on log shows what actually went wrong
+      if (err.response) {
+        // Axios HTTP error
+        const endpoint = err.mealieEndpoint || err.config?.url || 'unknown-endpoint';
+        console.error(
+          '[alexa] HTTP error in intent:',
+          intentName,
+          err.response.status,
+          endpoint,
+          JSON.stringify(err.response.data),
+        );
+      } else {
+        // Network / code error
+        console.error('[alexa] Error in intent:', intentName, err.code || '', err.message);
+      }
+      const userMessage = buildUserErrorMessage(err);
+      return res.json(buildResponse(userMessage));
+    }
+  }
+
+  return res.json(buildResponse('Diese Anfrage kann ich nicht verarbeiten.'));
+});
+
+// ── Error → user-friendly German message ──────────────────────────────────────
+function buildUserErrorMessage(err) {
+  if (err.response) {
+    const status = err.response.status;
+    if (status === 401 || status === 403) {
+      return 'Mealie meldet einen Authentifizierungsfehler. Bitte prüfe das API-Token in der Add-On-Konfiguration.';
+    }
+    if (status === 404) {
+      const endpoint = err.mealieEndpoint || err.config?.url || 'unbekannt';
+      return `Der Mealie-Endpunkt "${endpoint}" wurde nicht gefunden. Bitte prüfe Mealie-Version und Host-Einstellung.`;
+    }
+    if (status === 405) {
+      const endpoint = err.mealieEndpoint || err.config?.url || 'unbekannt';
+      return `Der Mealie-Endpunkt "${endpoint}" unterstützt diese Aktion nicht. Bitte prüfe Mealie-Version und API-Endpunkte.`;
+    }
+    return 'Mealie hat einen Fehler gemeldet. Bitte schau ins Add-On-Log für Details.';
+  }
+  const code = err.code || '';
+  if (code === 'ECONNREFUSED' || code === 'ENOTFOUND' || code === 'ECONNRESET' || code === 'ETIMEDOUT') {
+    return 'Mealie ist nicht erreichbar. Bitte stelle sicher, dass Mealie läuft und die Host-Einstellung korrekt ist.';
+  }
+  return 'Es ist ein unerwarteter Fehler aufgetreten. Bitte schau ins Add-On-Log für Details.';
+}
+
+// ── Alexa response builder ─────────────────────────────────────────────────────
+function buildResponse(text, shouldEndSession = true) {
+  const response = {
+    version: '1.0',
+    response: {
+      outputSpeech: {
+        type: 'PlainText',
+        text,
+      },
+      shouldEndSession,
+    },
+  };
+  if (!shouldEndSession) {
+    response.response.reprompt = {
+      outputSpeech: {
+        type: 'PlainText',
+        text,
+      },
+    };
+  }
+  return response;
+}
+
+// ── Start server ───────────────────────────────────────────────────────────────
+const port = config.port || 3030;
+app.listen(port, () => {
+  console.log(`[server] HA Alexa Intents listening on port ${port}`);
+});

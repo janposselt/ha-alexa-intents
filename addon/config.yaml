@@ -1,0 +1,24 @@
+name: "HA Alexa Intents"
+description: "Generic Alexa Skill Intent Handler – antwortet auf beliebige Alexa-Intents über eine erweiterbare Registry"
+version: "1.0.0"
+slug: "ha_alexa_intents"
+url: "https://github.com/janposselt/ha-alexa-intents"
+init: false
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+options:
+  port: 3030
+  mealie_host: "http://localhost:9000"
+  mealie_token: ""
+schema:
+  port: int
+  mealie_host: str
+  mealie_token: str
+ports:
+  3030/tcp: 3030
+ports_description:
+  3030/tcp: "Alexa Intent Handler HTTP Port"
