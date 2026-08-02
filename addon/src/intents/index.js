@@ -15,6 +15,8 @@ const { handleMealPlanDelete } = require('./MealPlanDelete');
 const { handleMealPlanNextDays } = require('./MealPlanNextDays');
 const { handleMealPlanDialogWithoutActiveSession } = require('./MealPlanDialog');
 const { handleCreateRecipe } = require('./CreateRecipe');
+const { handleMealPlanCreate } = require('./MealPlanCreate');
+const { handleShoppingListRead } = require('./ShoppingListRead');
 
 // ── MealPlanned ────────────────────────────────────────────────────────────────
 // Query what is planned for a given date.
@@ -37,6 +39,8 @@ registry.register('MealPlanForToday', (slots, config) => handleMealPlanForDay('t
 registry.register('MealPlanForTomorrow', (slots, config) => handleMealPlanForDay('tomorrow', slots, config));
 registry.register('MealPlanDelete', handleMealPlanDelete);
 registry.register('MealPlanNextDays', handleMealPlanNextDays);
+registry.register('MealPlanCreate', handleMealPlanCreate);
+registry.register('ShoppingListRead', handleShoppingListRead);
 registry.register('MealPlanDialogChoice', handleMealPlanDialogWithoutActiveSession);
 registry.register('MealPlanDialogRetryRecipe', handleMealPlanDialogWithoutActiveSession);
 registry.register('DialogTextInput', handleMealPlanDialogWithoutActiveSession);

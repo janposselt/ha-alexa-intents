@@ -270,6 +270,20 @@ async function parseIngredient(config, ingredientText) {
   }
 }
 
+/**
+ * Retrieves the full recipe details (including ingredients) by slug.
+ *
+ * @param {object} config
+ * @param {string} slug - Recipe slug or ID
+ * @returns {Promise<object>} Full recipe object
+ */
+async function getRecipe(config, slug) {
+  const client = createClient(config);
+  const endpoints = [`/api/recipes/${slug}`, `/api/households/recipes/${slug}`];
+  const response = await requestWithEndpointFallback(client, 'get', endpoints, {});
+  return response.data;
+}
+
 module.exports = {
   getMealPlan,
   searchRecipes,
@@ -279,4 +293,5 @@ module.exports = {
   createRecipe,
   updateRecipe,
   parseIngredient,
+  getRecipe,
 };

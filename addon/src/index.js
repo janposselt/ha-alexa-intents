@@ -11,11 +11,15 @@ const registry = require('./registry');
 const dialogManager = require('./dialogs/manager');
 const recipeNotFoundDialog = require('./dialogs/recipeNotFound');
 const createRecipeDialog = require('./dialogs/createRecipe');
+const mealPlanCreatorDialog = require('./dialogs/mealPlanCreator');
+const shoppingListReaderDialog = require('./dialogs/shoppingListReader');
 
 // Register all intent handlers
 require('./intents/index');
 dialogManager.registerDialogHandler(recipeNotFoundDialog.TYPE, recipeNotFoundDialog);
 dialogManager.registerDialogHandler(createRecipeDialog.TYPE, createRecipeDialog);
+dialogManager.registerDialogHandler(mealPlanCreatorDialog.TYPE, mealPlanCreatorDialog);
+dialogManager.registerDialogHandler(shoppingListReaderDialog.TYPE, shoppingListReaderDialog);
 
 const app = express();
 app.use(express.json());
