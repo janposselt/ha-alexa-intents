@@ -99,14 +99,15 @@ app.post('/alexa', async (req, res) => {
         // Axios HTTP error
         const endpoint = err.mealieEndpoint || err.config?.url || 'unknown-endpoint';
         console.error(
-          `[alexa] HTTP error in intent "${intentName}":`,
+          '[alexa] HTTP error in intent:',
+          intentName,
           err.response.status,
           endpoint,
           JSON.stringify(err.response.data),
         );
       } else {
         // Network / code error
-        console.error(`[alexa] Error in intent "${intentName}":`, err.code || '', err.message);
+        console.error('[alexa] Error in intent:', intentName, err.code || '', err.message);
       }
       const userMessage = buildUserErrorMessage(err);
       return res.json(buildResponse(userMessage));
@@ -127,7 +128,7 @@ function buildUserErrorMessage(err) {
       const endpoint = err.mealieEndpoint || err.config?.url || 'unbekannt';
       return `Der Mealie-Endpunkt "${endpoint}" wurde nicht gefunden. Bitte prüfe Mealie-Version und Host-Einstellung.`;
     }
-    return `Mealie hat einen Fehler gemeldet (${status}). Bitte schau ins Add-On-Log für Details.`;
+    return 'Mealie hat einen Fehler gemeldet. Bitte schau ins Add-On-Log für Details.';
   }
   const code = err.code || '';
   if (code === 'ECONNREFUSED' || code === 'ENOTFOUND' || code === 'ECONNRESET' || code === 'ETIMEDOUT') {
