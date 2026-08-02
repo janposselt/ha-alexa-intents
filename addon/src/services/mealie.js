@@ -52,6 +52,29 @@ async function requestWithEndpointFallback(client, method, endpoints, options, f
         lastError = err;
         continue;
       }
+
+      /**
+       * Performs a request against fallback endpoint candidates with an item ID suffix.
+       *
+       * @param {import('axios').AxiosInstance} client
+       * @param {'delete'} method
+       * @param {string[]} endpoints
+       * @param {string} itemId
+       * @param {object} options
+       * @param {number[]} [fallbackStatuses]
+       * @returns {Promise<import('axios').AxiosResponse>}
+       */
+      async function requestWithEndpointIdFallback(
+        client,
+        method,
+        endpoints,
+        itemId,
+        options = {},
+        fallbackStatuses = [404, 405],
+      ) {
+        const withId = endpoints.map((endpoint) => `${endpoint}/${itemId}`);
+        return requestWithEndpointFallback(client, method, withId, options, fallbackStatuses);
+      }
       throw err;
     }
   }
@@ -127,4 +150,45 @@ async function createMealPlan(config, date, recipeId, title) {
   return response.data;
 }
 
-module.exports = { getMealPlan, searchRecipes, createMealPlan };
+/**
+ * Deletes a meal plan entry by entry ID.
+ *
+ * @param {object} config
+ * @param {string} entryId
+ * @returns {Promise<void>}
+ */
+async function deleteMealPlanEntry(config, entryId) {
+  const client = createClient(config);
+  await requestWithEndpointIdFallback(client, 'delete', MEALPLAN_ENDPOINTS, entryId);
+}
+
+/**
+ * Deletes all meal plan entries for a specific date.
+ *
+ * @param {object} config
+ * @param {Date} date
+ * @returns {Promise<{ deletedCount: number, totalCount: number }>}
+ */
+async function deleteMealPlanForDate(config, date) {
+  const mealPlan = await getMealPlan(config, date);
+  const items = Array.isArray(mealPlan?.items) ? mealPlan.items : [];
+  let deletedCount = 0;
+
+  for (const item of items) {
+    if (!item?.id) {
+      continue;
+    }
+    await deleteMealPlanEntry(config, item.id);
+    deletedCount += 1;
+  }
+
+  return { deletedCount, totalCount: items.length };
+}
+
+module.exports = {
+  getMealPlan,
+  searchRecipes,
+  createMealPlan,
+  deleteMealPlanEntry,
+  deleteMealPlanForDate,
+};

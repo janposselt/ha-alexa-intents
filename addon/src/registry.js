@@ -4,7 +4,7 @@
  * Maps Alexa intent names to handler functions.
  *
  * Handler signature:
- *   async (slots: Record<string, { value: string }>, config: object) => string
+ *   async (slots: Record<string, { value: string }>, config: object) => string | { text: string, shouldEndSession?: boolean }
  *
  * To add a new intent:
  *   1. Create a handler file in ./intents/
@@ -16,7 +16,7 @@ const handlers = new Map();
 /**
  * Register an intent handler.
  * @param {string} intentName - Alexa intent name
- * @param {Function} handler  - async (slots, config) => string
+ * @param {Function} handler  - async (slots, config) => string | { text, shouldEndSession? }
  */
 function register(intentName, handler) {
   handlers.set(intentName, handler);

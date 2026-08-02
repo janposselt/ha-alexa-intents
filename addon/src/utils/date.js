@@ -3,6 +3,7 @@
  */
 
 const WEEKDAY_NAMES = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+const WEEKDAY_DE = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
 
 /**
  * Returns the target Date for a day identifier.
@@ -63,6 +64,55 @@ function startOfToday() {
 }
 
 /**
+ * Returns true when two dates refer to the same local calendar day.
+ * @param {Date} a
+ * @param {Date} b
+ * @returns {boolean}
+ */
+function isSameDay(a, b) {
+  return (
+    a.getFullYear() === b.getFullYear()
+    && a.getMonth() === b.getMonth()
+    && a.getDate() === b.getDate()
+  );
+}
+
+/**
+ * Returns whole-day distance from reference date to target date.
+ * @param {Date} reference
+ * @param {Date} target
+ * @returns {number}
+ */
+function diffInDays(reference, target) {
+  const ref = new Date(reference);
+  const trg = new Date(target);
+  ref.setHours(0, 0, 0, 0);
+  trg.setHours(0, 0, 0, 0);
+  const msPerDay = 24 * 60 * 60 * 1000;
+  return Math.round((trg.getTime() - ref.getTime()) / msPerDay);
+}
+
+/**
+ * Returns the NEXT occurrence of a weekday index from a reference date.
+ * If reference already has that weekday, returns the weekday in the following week.
+ *
+ * @param {number} weekdayIndex
+ * @param {Date} [referenceDate]
+ * @returns {Date}
+ */
+function getNextWeekdayFromDate(weekdayIndex, referenceDate = startOfToday()) {
+  const today = new Date(referenceDate);
+  today.setHours(0, 0, 0, 0);
+  let daysUntil = weekdayIndex - today.getDay();
+  if (daysUntil <= 0) {
+    daysUntil += 7;
+  }
+  const result = new Date(today);
+  result.setDate(today.getDate() + daysUntil);
+  return result;
+}
+
+/**
  * Formats a Date to YYYY-MM-DD (local time).
  * @param {Date} date
  * @returns {string}
@@ -87,4 +137,45 @@ function formatDateDE(date) {
   });
 }
 
-module.exports = { getTargetDate, getNextWeekday, formatDateISO, formatDateDE };
+/**
+ * Formats a date label for speech:
+ * - today/tomorrow for immediate days
+ * - only weekday if it is the next occurrence of that weekday name
+ * - otherwise "Montag, 03.08"
+ *
+ * @param {Date} date
+ * @param {Date} [referenceDate]
+ * @returns {string}
+ */
+function formatDateForSpeech(date, referenceDate = startOfToday()) {
+  const dayDiff = diffInDays(referenceDate, date);
+  if (dayDiff === 0) {
+    return 'heute';
+  }
+  if (dayDiff === 1) {
+    return 'morgen';
+  }
+
+  const weekdayIndex = date.getDay();
+  const weekdayName = WEEKDAY_DE[weekdayIndex];
+  const nextSameWeekday = getNextWeekdayFromDate(weekdayIndex, referenceDate);
+  if (isSameDay(date, nextSameWeekday)) {
+    return weekdayName;
+  }
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${weekdayName}, ${day}.${month}`;
+}
+
+module.exports = {
+  getTargetDate,
+  getNextWeekday,
+  getNextWeekdayFromDate,
+  startOfToday,
+  isSameDay,
+  diffInDays,
+  formatDateISO,
+  formatDateDE,
+  formatDateForSpeech,
+};

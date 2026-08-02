@@ -16,7 +16,9 @@
  */
 
 const mealie = require('../services/mealie');
-const { getTargetDate, formatDateDE } = require('../utils/date');
+const { getTargetDate, formatDateForSpeech } = require('../utils/date');
+const dialogManager = require('../dialogs/manager');
+const recipeNotFoundDialog = require('../dialogs/recipeNotFound');
 
 /**
  * @param {string} dayIdentifier - 'today' | 'tomorrow' | lowercase weekday name
@@ -32,7 +34,7 @@ async function handleMealPlanForDay(dayIdentifier, slots, config) {
   }
 
   const date = getTargetDate(dayIdentifier);
-  const dateLabel = formatDateDE(date);
+  const dateLabel = formatDateForSpeech(date);
 
   const searchResult = await mealie.searchRecipes(config, recipeQuery);
   const recipes = Array.isArray(searchResult?.items) ? searchResult.items : [];
@@ -43,9 +45,17 @@ async function handleMealPlanForDay(dayIdentifier, slots, config) {
     return `Ich habe ${recipe.name} für ${dateLabel} eingetragen.`;
   }
 
-  // No matching recipe found – create a note instead
-  await mealie.createMealPlan(config, date, null, recipeQuery);
-  return `Ich habe kein Rezept für "${recipeQuery}" gefunden und stattdessen eine Notiz für ${dateLabel} eingetragen.`;
+  const sessionId = config.__sessionId;
+  if (!sessionId) {
+    await mealie.createMealPlan(config, date, null, recipeQuery);
+    return `Ich habe kein Rezept für "${recipeQuery}" gefunden und stattdessen eine Notiz für ${dateLabel} eingetragen.`;
+  }
+
+  return dialogManager.startDialog(
+    sessionId,
+    recipeNotFoundDialog.TYPE,
+    recipeNotFoundDialog.buildInitialState(date, recipeQuery),
+  );
 }
 
 module.exports = { handleMealPlanForDay };

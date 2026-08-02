@@ -23,8 +23,12 @@ An Alexa custom skill forwards every `IntentRequest` to this service. The servic
 | `MealPlanForMonday` … `MealPlanForSunday` | `receipt` (AMAZON.SearchQuery) | Searches Mealie for the recipe name and sets it for the next occurrence of that weekday |
 | `MealPlanForToday` | `receipt` | Sets a recipe or note for today |
 | `MealPlanForTomorrow` | `receipt` | Sets a recipe or note for tomorrow |
+| `MealPlanDelete` | `date` (AMAZON.DATE) | Deletes all meal plan entries for the given date |
+| `MealPlanNextDays` | `days` (AMAZON.NUMBER) | Reads the meal plan for the next X days (including today) |
 
 **Weekday rule:** `MealPlanForMonday` always refers to the *next* Monday. If today *is* Monday it resolves to next week Monday.
+
+**Dialog rule:** If no recipe is found while setting a meal, Alexa asks whether to create a note, search another recipe, or cancel.
 
 ---
 

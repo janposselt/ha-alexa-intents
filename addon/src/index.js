@@ -8,9 +8,12 @@
 const express = require('express');
 const config = require('./config');
 const registry = require('./registry');
+const dialogManager = require('./dialogs/manager');
+const recipeNotFoundDialog = require('./dialogs/recipeNotFound');
 
 // Register all intent handlers
 require('./intents/index');
+dialogManager.registerDialogHandler(recipeNotFoundDialog.TYPE, recipeNotFoundDialog);
 
 const app = express();
 app.use(express.json());
@@ -72,12 +75,22 @@ app.post('/alexa', async (req, res) => {
   }
 
   if (requestType === 'SessionEndedRequest') {
+    dialogManager.clearDialog(body?.session?.sessionId);
     return res.json({ version: '1.0', response: {} });
   }
 
   if (requestType === 'IntentRequest') {
+    const dialogTurn = await dialogManager.continueDialogIfActive(body, config);
+    if (dialogTurn) {
+      return res.json(buildResponse(dialogTurn.text, dialogTurn.shouldEndSession));
+    }
+
     const intentName = body.request.intent?.name;
     const slots = body.request.intent?.slots || {};
+    const requestConfig = {
+      ...config,
+      __sessionId: body?.session?.sessionId || null,
+    };
 
     // Built-in stop / cancel intents
     if (intentName === 'AMAZON.StopIntent' || intentName === 'AMAZON.CancelIntent') {
@@ -91,8 +104,16 @@ app.post('/alexa', async (req, res) => {
     }
 
     try {
-      const text = await handler(slots, config);
-      return res.json(buildResponse(text));
+      const handlerResult = await handler(slots, requestConfig);
+      if (typeof handlerResult === 'string') {
+        return res.json(buildResponse(handlerResult));
+      }
+
+      if (handlerResult && typeof handlerResult === 'object' && typeof handlerResult.text === 'string') {
+        return res.json(buildResponse(handlerResult.text, handlerResult.shouldEndSession ?? true));
+      }
+
+      return res.json(buildResponse('Es ist ein unerwarteter Fehler aufgetreten.'));
     } catch (err) {
       // Log full details so the add-on log shows what actually went wrong
       if (err.response) {
@@ -143,7 +164,7 @@ function buildUserErrorMessage(err) {
 
 // ── Alexa response builder ─────────────────────────────────────────────────────
 function buildResponse(text, shouldEndSession = true) {
-  return {
+  const response = {
     version: '1.0',
     response: {
       outputSpeech: {
@@ -153,6 +174,15 @@ function buildResponse(text, shouldEndSession = true) {
       shouldEndSession,
     },
   };
+  if (!shouldEndSession) {
+    response.response.reprompt = {
+      outputSpeech: {
+        type: 'PlainText',
+        text,
+      },
+    };
+  }
+  return response;
 }
 
 // ── Start server ───────────────────────────────────────────────────────────────

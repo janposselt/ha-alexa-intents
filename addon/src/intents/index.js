@@ -11,6 +11,9 @@
 const registry = require('../registry');
 const { handleMealPlanned } = require('./MealPlanned');
 const { handleMealPlanForDay } = require('./MealPlanForDay');
+const { handleMealPlanDelete } = require('./MealPlanDelete');
+const { handleMealPlanNextDays } = require('./MealPlanNextDays');
+const { handleMealPlanDialogWithoutActiveSession } = require('./MealPlanDialog');
 
 // ── MealPlanned ────────────────────────────────────────────────────────────────
 // Query what is planned for a given date.
@@ -30,3 +33,7 @@ for (const day of WEEKDAYS) {
 
 registry.register('MealPlanForToday', (slots, config) => handleMealPlanForDay('today', slots, config));
 registry.register('MealPlanForTomorrow', (slots, config) => handleMealPlanForDay('tomorrow', slots, config));
+registry.register('MealPlanDelete', handleMealPlanDelete);
+registry.register('MealPlanNextDays', handleMealPlanNextDays);
+registry.register('MealPlanDialogChoice', handleMealPlanDialogWithoutActiveSession);
+registry.register('MealPlanDialogRetryRecipe', handleMealPlanDialogWithoutActiveSession);

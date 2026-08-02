@@ -16,6 +16,14 @@
           "samples": []
         },
         {
+          "name": "AMAZON.YesIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NoIntent",
+          "samples": []
+        },
+        {
           "name": "MealPlanned",
           "slots": [
             {
@@ -158,6 +166,99 @@
             "Trage {receipt} für Sonntag ein",
             "Am Sonntag gibt es {receipt}",
             "Setze Sonntag {receipt}"
+          ]
+        },
+        {
+          "name": "MealPlanDelete",
+          "slots": [
+            {
+              "name": "date",
+              "type": "AMAZON.DATE"
+            }
+          ],
+          "samples": [
+            "Lösche den Essensplan für {date}",
+            "Entferne den Essensplan für {date}",
+            "Streiche den Essensplan für {date}"
+          ]
+        },
+        {
+          "name": "MealPlanNextDays",
+          "slots": [
+            {
+              "name": "days",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "Lies den Essensplan für die nächsten {days} Tage vor",
+            "Was gibt es in den nächsten {days} Tagen",
+            "Essensplan für {days} Tage"
+          ]
+        },
+        {
+          "name": "MealPlanDialogChoice",
+          "slots": [
+            {
+              "name": "choice",
+              "type": "MEALPLAN_DIALOG_ACTION"
+            }
+          ],
+          "samples": [
+            "{choice}",
+            "Ich möchte {choice}",
+            "Bitte {choice}"
+          ]
+        },
+        {
+          "name": "MealPlanDialogRetryRecipe",
+          "slots": [
+            {
+              "name": "receipt",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "Suche {receipt}",
+            "Nimm {receipt}",
+            "{receipt}"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "name": "MEALPLAN_DIALOG_ACTION",
+          "values": [
+            {
+              "name": {
+                "value": "Notiz erstellen",
+                "synonyms": [
+                  "Notiz",
+                  "als Notiz",
+                  "Notiz speichern"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "anderes Rezept suchen",
+                "synonyms": [
+                  "anderes Rezept",
+                  "erneut suchen",
+                  "neu suchen"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "abbrechen",
+                "synonyms": [
+                  "Abbruch",
+                  "stop",
+                  "stopp"
+                ]
+              }
+            }
           ]
         }
       ]
