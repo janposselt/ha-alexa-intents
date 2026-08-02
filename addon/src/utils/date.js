@@ -6,13 +6,51 @@ const WEEKDAY_NAMES = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', '
 const WEEKDAY_DE = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
 
 /**
+ * Parses a local date string in YYYY-MM-DD format.
+ * @param {string} dateString
+ * @returns {Date|null}
+ */
+function parseLocalDateString(dateString) {
+  if (typeof dateString !== 'string') {
+    return null;
+  }
+
+  const trimmed = dateString.trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    return null;
+  }
+
+  const [yearString, monthString, dayString] = trimmed.split('-');
+  const year = Number(yearString);
+  const month = Number(monthString);
+  const day = Number(dayString);
+  const date = new Date(year, month - 1, day);
+
+  if (
+    date.getFullYear() !== year
+    || date.getMonth() !== month - 1
+    || date.getDate() !== day
+  ) {
+    return null;
+  }
+
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+/**
  * Returns the target Date for a day identifier.
  *
- * @param {'today'|'tomorrow'|'monday'|'tuesday'|'wednesday'|'thursday'|'friday'|'saturday'|'sunday'} dayIdentifier
+ * @param {'today'|'tomorrow'|'monday'|'tuesday'|'wednesday'|'thursday'|'friday'|'saturday'|'sunday'|string} dayIdentifier
  * @returns {Date}
  */
 function getTargetDate(dayIdentifier) {
-  const id = dayIdentifier.toLowerCase();
+  const localDate = parseLocalDateString(dayIdentifier);
+  if (localDate) {
+    return localDate;
+  }
+
+  const id = dayIdentifier.trim().toLowerCase();
 
   if (id === 'today') {
     return startOfToday();
@@ -169,6 +207,7 @@ function formatDateForSpeech(date, referenceDate = startOfToday()) {
 }
 
 module.exports = {
+  parseLocalDateString,
   getTargetDate,
   getNextWeekday,
   getNextWeekdayFromDate,

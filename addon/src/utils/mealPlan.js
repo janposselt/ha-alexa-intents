@@ -1,4 +1,4 @@
-const { formatDateForSpeech } = require('./date');
+const { formatDateForSpeech, parseLocalDateString } = require('./date');
 
 /**
  * Parses an Alexa date slot value into a local Date (midnight).
@@ -17,16 +17,7 @@ function parseAlexaDateSlot(dateValue) {
     return d;
   }
 
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
-    return null;
-  }
-
-  const d = new Date(dateValue);
-  if (isNaN(d.getTime())) {
-    return null;
-  }
-  d.setHours(0, 0, 0, 0);
-  return d;
+  return parseLocalDateString(dateValue);
 }
 
 /**

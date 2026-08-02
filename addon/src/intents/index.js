@@ -32,6 +32,7 @@ for (const day of WEEKDAYS) {
   );
 }
 
+registry.register('MealPlanAdd', (slots, config) => handleMealPlanForDay(slots.date?.value, slots, config));
 registry.register('MealPlanForToday', (slots, config) => handleMealPlanForDay('today', slots, config));
 registry.register('MealPlanForTomorrow', (slots, config) => handleMealPlanForDay('tomorrow', slots, config));
 registry.register('MealPlanDelete', handleMealPlanDelete);

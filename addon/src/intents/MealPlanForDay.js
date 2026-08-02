@@ -22,7 +22,7 @@ const dialogManager = require('../dialogs/manager');
 const recipeNotFoundDialog = require('../dialogs/recipeNotFound');
 
 /**
- * @param {string} dayIdentifier - 'today' | 'tomorrow' | lowercase weekday name
+ * @param {string} dayIdentifier - 'today' | 'tomorrow' | lowercase weekday name | YYYY-MM-DD
  * @param {Record<string, { value: string }>} slots
  * @param {object} config
  * @returns {Promise<string>}

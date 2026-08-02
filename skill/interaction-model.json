@@ -43,11 +43,33 @@
           ]
         },
         {
+          "name": "MealPlanAdd",
+          "slots": [
+            {
+              "name": "receipt",
+              "type": "DIALOG_TEXT_INPUT"
+            },
+            {
+              "name": "date",
+              "type": "AMAZON.DATE"
+            }
+          ],
+          "samples": [
+            "Trage {receipt} für {date} ein",
+            "Trage für {date} {receipt} ein",
+            "{date} gibt es {receipt}",
+            "Am {date} gibt es {receipt}",
+            "Setze {date} {receipt}",
+            "Setze {receipt} für {date}",
+            "Füge {receipt} für {date} hinzu"
+          ]
+        },
+        {
           "name": "MealPlanForToday",
           "slots": [
             {
               "name": "receipt",
-              "type": "AMAZON.SearchQuery"
+              "type": "DIALOG_TEXT_INPUT"
             }
           ],
           "samples": [
@@ -61,7 +83,7 @@
           "slots": [
             {
               "name": "receipt",
-              "type": "AMAZON.SearchQuery"
+              "type": "DIALOG_TEXT_INPUT"
             }
           ],
           "samples": [
@@ -75,7 +97,7 @@
           "slots": [
             {
               "name": "receipt",
-              "type": "AMAZON.SearchQuery"
+              "type": "DIALOG_TEXT_INPUT"
             }
           ],
           "samples": [
@@ -89,7 +111,7 @@
           "slots": [
             {
               "name": "receipt",
-              "type": "AMAZON.SearchQuery"
+              "type": "DIALOG_TEXT_INPUT"
             }
           ],
           "samples": [
@@ -103,7 +125,7 @@
           "slots": [
             {
               "name": "receipt",
-              "type": "AMAZON.SearchQuery"
+              "type": "DIALOG_TEXT_INPUT"
             }
           ],
           "samples": [
@@ -117,7 +139,7 @@
           "slots": [
             {
               "name": "receipt",
-              "type": "AMAZON.SearchQuery"
+              "type": "DIALOG_TEXT_INPUT"
             }
           ],
           "samples": [
@@ -131,7 +153,7 @@
           "slots": [
             {
               "name": "receipt",
-              "type": "AMAZON.SearchQuery"
+              "type": "DIALOG_TEXT_INPUT"
             }
           ],
           "samples": [
@@ -145,7 +167,7 @@
           "slots": [
             {
               "name": "receipt",
-              "type": "AMAZON.SearchQuery"
+              "type": "DIALOG_TEXT_INPUT"
             }
           ],
           "samples": [
@@ -159,7 +181,7 @@
           "slots": [
             {
               "name": "receipt",
-              "type": "AMAZON.SearchQuery"
+              "type": "DIALOG_TEXT_INPUT"
             }
           ],
           "samples": [
@@ -207,22 +229,7 @@
           "samples": [
             "{choice}",
             "Ich möchte {choice}",
-            "Bitte {choice}",
-            "Notiz erstellen",
-            "Notiz anlegen",
-            "als Notiz speichern",
-            "anderes Rezept suchen",
-            "ein anderes Rezept suchen",
-            "neues Rezept erstellen",
-            "ein neues Rezept erstellen",
-            "Rezept erstellen",
-            "Rezept anlegen",
-            "Fertig",
-            "Ich bin fertig",
-            "Das wars",
-            "korrigieren",
-            "letzte Zutat korrigieren",
-            "abbrechen"
+            "Bitte {choice}"
           ]
         },
         {
@@ -230,7 +237,7 @@
           "slots": [
             {
               "name": "receipt",
-              "type": "AMAZON.SearchQuery"
+              "type": "DIALOG_TEXT_INPUT"
             }
           ],
           "samples": [
@@ -248,8 +255,7 @@
             }
           ],
           "samples": [
-            "{query}",
-            "bitte {query}"
+            "{query}"
           ]
         },
         {
