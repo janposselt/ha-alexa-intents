@@ -40,7 +40,7 @@ async function handleMealPlanned(slots, config) {
   const dateLabel = formatDateDE(date);
 
   const mealPlan = await mealie.getMealPlan(config, date);
-  const items = mealPlan.items || [];
+  const items = Array.isArray(mealPlan?.items) ? mealPlan.items : [];
 
   if (items.length === 0) {
     return `Für ${dateLabel} ist nichts im Essensplan eingetragen.`;

@@ -94,13 +94,44 @@ app.post('/alexa', async (req, res) => {
       const text = await handler(slots, config);
       return res.json(buildResponse(text));
     } catch (err) {
-      console.error(`[alexa] Error in intent "${intentName}":`, err.message);
-      return res.json(buildResponse('Es ist ein Fehler aufgetreten. Bitte versuche es später erneut.'));
+      // Log full details so the add-on log shows what actually went wrong
+      if (err.response) {
+        // Axios HTTP error
+        console.error(
+          `[alexa] HTTP error in intent "${intentName}":`,
+          err.response.status,
+          JSON.stringify(err.response.data),
+        );
+      } else {
+        // Network / code error
+        console.error(`[alexa] Error in intent "${intentName}":`, err.code || '', err.message);
+      }
+      const userMessage = buildUserErrorMessage(err);
+      return res.json(buildResponse(userMessage));
     }
   }
 
   return res.json(buildResponse('Diese Anfrage kann ich nicht verarbeiten.'));
 });
+
+// ── Error → user-friendly German message ──────────────────────────────────────
+function buildUserErrorMessage(err) {
+  if (err.response) {
+    const status = err.response.status;
+    if (status === 401 || status === 403) {
+      return 'Mealie meldet einen Authentifizierungsfehler. Bitte prüfe das API-Token in der Add-On-Konfiguration.';
+    }
+    if (status === 404) {
+      return 'Der Mealie-Endpunkt wurde nicht gefunden. Bitte prüfe die Mealie-Host-Einstellung.';
+    }
+    return `Mealie hat einen Fehler gemeldet (${status}). Bitte schau ins Add-On-Log für Details.`;
+  }
+  const code = err.code || '';
+  if (code === 'ECONNREFUSED' || code === 'ENOTFOUND' || code === 'ECONNRESET' || code === 'ETIMEDOUT') {
+    return 'Mealie ist nicht erreichbar. Bitte stelle sicher, dass Mealie läuft und die Host-Einstellung korrekt ist.';
+  }
+  return 'Es ist ein unerwarteter Fehler aufgetreten. Bitte schau ins Add-On-Log für Details.';
+}
 
 // ── Alexa response builder ─────────────────────────────────────────────────────
 function buildResponse(text, shouldEndSession = true) {

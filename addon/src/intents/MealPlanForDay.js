@@ -35,7 +35,7 @@ async function handleMealPlanForDay(dayIdentifier, slots, config) {
   const dateLabel = formatDateDE(date);
 
   const searchResult = await mealie.searchRecipes(config, recipeQuery);
-  const recipes = searchResult.items || [];
+  const recipes = Array.isArray(searchResult?.items) ? searchResult.items : [];
 
   if (recipes.length > 0) {
     const recipe = recipes[0];
