@@ -16,7 +16,47 @@ const app = express();
 app.use(express.json());
 
 // ── Health check ───────────────────────────────────────────────────────────────
-app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', port, uptime: Math.round(process.uptime()), intents: registry.list() });
+});
+
+app.get('/', (_req, res) => {
+  const startTime = new Date(Date.now() - Math.round(process.uptime() * 1000));
+  const intentList = registry.list().map(n => `<li><code>${n}</code></li>`).join('\n    ');
+  const html = `<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HA Alexa Intents</title>
+  <style>
+    body { font-family: sans-serif; max-width: 680px; margin: 40px auto; padding: 0 20px; color: #333; }
+    h1 { color: #1a73e8; }
+    .badge { display: inline-block; background: #34a853; color: #fff; padding: 4px 12px; border-radius: 12px; font-weight: bold; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1em; }
+    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #e0e0e0; }
+    th { background: #f5f5f5; }
+    code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <h1>HA Alexa Intents</h1>
+  <p><span class="badge">&#10003; Running</span></p>
+  <table>
+    <tr><th>Port</th><td><code>${port}</code></td></tr>
+    <tr><th>Started</th><td>${startTime.toLocaleString('de-DE')}</td></tr>
+    <tr><th>Uptime</th><td>${Math.round(process.uptime())} s</td></tr>
+    <tr><th>Alexa Endpoint</th><td><code>POST /alexa</code></td></tr>
+    <tr><th>Health (JSON)</th><td><a href="/health"><code>/health</code></a></td></tr>
+  </table>
+  <h2>Registrierte Intents</h2>
+  <ul>
+    ${intentList}
+  </ul>
+</body>
+</html>`;
+  res.type('html').send(html);
+});
 
 // ── Alexa request handler ──────────────────────────────────────────────────────
 app.post('/alexa', async (req, res) => {
@@ -77,7 +117,7 @@ function buildResponse(text, shouldEndSession = true) {
 }
 
 // ── Start server ───────────────────────────────────────────────────────────────
-const port = config.port || 3000;
+const port = config.port || 3030;
 app.listen(port, () => {
   console.log(`[server] HA Alexa Intents listening on port ${port}`);
 });

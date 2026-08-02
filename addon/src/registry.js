@@ -31,4 +31,4 @@ function get(intentName) {
   return handlers.get(intentName) || null;
 }
 
-module.exports = { register, get };
+module.exports = { register, get, list: () => Array.from(handlers.keys()) };
