@@ -123,45 +123,6 @@ function normalizeAction(rawAction) {
   if (!value) {
     return null;
   }
-
-  function extractBestSlotValue(slots, preferredNames = []) {
-    for (const slotName of preferredNames) {
-      const value = slots?.[slotName]?.value;
-      if (typeof value === 'string' && value.trim()) {
-        return value.trim();
-      }
-    }
-
-    for (const slot of Object.values(slots || {})) {
-      const value = slot?.value;
-      if (typeof value === 'string' && value.trim()) {
-        return value.trim();
-      }
-    }
-
-    return null;
-  }
-
-  function resolveAction(intentName, slots) {
-    if (intentName === 'AMAZON.YesIntent') {
-      return 'retry';
-    }
-    if (intentName === 'AMAZON.NoIntent') {
-      return 'cancel';
-    }
-    if (intentName === 'MealPlanDialogRetryRecipe') {
-      return 'retry';
-    }
-
-    const choiceValue = slots.choice?.value;
-    const actionFromChoiceSlot = normalizeAction(choiceValue);
-    if (actionFromChoiceSlot) {
-      return actionFromChoiceSlot;
-    }
-
-    const anySlotValue = extractBestSlotValue(slots);
-    return normalizeAction(anySlotValue);
-  }
   if (value.includes('abbruch') || value.includes('abbrechen') || value.includes('stopp')) {
     return 'cancel';
   }
@@ -172,6 +133,45 @@ function normalizeAction(rawAction) {
     return 'retry';
   }
   return null;
+}
+
+function extractBestSlotValue(slots, preferredNames = []) {
+  for (const slotName of preferredNames) {
+    const value = slots?.[slotName]?.value;
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  for (const slot of Object.values(slots || {})) {
+    const value = slot?.value;
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return null;
+}
+
+function resolveAction(intentName, slots) {
+  if (intentName === 'AMAZON.YesIntent') {
+    return 'retry';
+  }
+  if (intentName === 'AMAZON.NoIntent') {
+    return 'cancel';
+  }
+  if (intentName === 'MealPlanDialogRetryRecipe') {
+    return 'retry';
+  }
+
+  const choiceValue = slots.choice?.value;
+  const actionFromChoiceSlot = normalizeAction(choiceValue);
+  if (actionFromChoiceSlot) {
+    return actionFromChoiceSlot;
+  }
+
+  const anySlotValue = extractBestSlotValue(slots);
+  return normalizeAction(anySlotValue);
 }
 
 function buildInitialState(date, originalQuery) {
