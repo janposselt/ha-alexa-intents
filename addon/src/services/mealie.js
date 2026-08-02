@@ -187,6 +187,38 @@ async function deleteMealPlanForDate(config, date) {
 
 const PARSER_ENDPOINT = '/api/parser/ingredient';
 
+function buildRawIngredientNote(ingredientText) {
+  return {
+    note: ingredientText,
+    original_text: ingredientText,
+  };
+}
+
+function hasMissingNestedId(entity) {
+  return Boolean(entity && !entity.id);
+}
+
+/**
+ * Mealie's recipe PATCH endpoint expects nested food/unit references to point to
+ * existing organizer entities by id. If the parser only returned ad-hoc names,
+ * fall back to a note-only ingredient so recipe creation still succeeds.
+ *
+ * @param {object} ingredient
+ * @param {string} ingredientText
+ * @returns {object}
+ */
+function normalizeParsedIngredient(ingredient, ingredientText) {
+  if (!ingredient || typeof ingredient !== 'object') {
+    return buildRawIngredientNote(ingredientText);
+  }
+
+  if (hasMissingNestedId(ingredient.food) || hasMissingNestedId(ingredient.unit)) {
+    return buildRawIngredientNote(ingredientText);
+  }
+
+  return ingredient;
+}
+
 /**
  * Creates a new recipe by name.
  *
@@ -219,11 +251,12 @@ async function updateRecipe(config, slug, data) {
 
 /**
  * Parses a single ingredient string using the Mealie NLP parser.
- * Falls back to a raw note object if the API is unavailable.
+ * Falls back to a raw note object if the API is unavailable or the parsed
+ * ingredient cannot be patched back into a recipe safely.
  *
  * @param {object} config
  * @param {string} ingredientText
- * @returns {Promise<object>} Parsed ingredient object suitable for PUT /api/recipes/{slug}
+ * @returns {Promise<object>} Ingredient payload suitable for PATCH /api/recipes/{slug}
  */
 async function parseIngredient(config, ingredientText) {
   const client = createClient(config);
@@ -231,12 +264,9 @@ async function parseIngredient(config, ingredientText) {
     const response = await client.post(PARSER_ENDPOINT, { ingredient: ingredientText });
     const parsed = response.data;
     // Return the ingredient sub-object if it exists, otherwise the whole response
-    return parsed?.ingredient ?? parsed;
+    return normalizeParsedIngredient(parsed?.ingredient ?? parsed, ingredientText);
   } catch {
-    return {
-      note: ingredientText,
-      original_text: ingredientText,
-    };
+    return buildRawIngredientNote(ingredientText);
   }
 }
 
