@@ -97,9 +97,11 @@ app.post('/alexa', async (req, res) => {
       // Log full details so the add-on log shows what actually went wrong
       if (err.response) {
         // Axios HTTP error
+        const endpoint = err.mealieEndpoint || err.config?.url || 'unknown-endpoint';
         console.error(
           `[alexa] HTTP error in intent "${intentName}":`,
           err.response.status,
+          endpoint,
           JSON.stringify(err.response.data),
         );
       } else {
@@ -122,7 +124,8 @@ function buildUserErrorMessage(err) {
       return 'Mealie meldet einen Authentifizierungsfehler. Bitte prüfe das API-Token in der Add-On-Konfiguration.';
     }
     if (status === 404) {
-      return 'Der Mealie-Endpunkt wurde nicht gefunden. Bitte prüfe die Mealie-Host-Einstellung.';
+      const endpoint = err.mealieEndpoint || err.config?.url || 'unbekannt';
+      return `Der Mealie-Endpunkt "${endpoint}" wurde nicht gefunden. Bitte prüfe Mealie-Version und Host-Einstellung.`;
     }
     return `Mealie hat einen Fehler gemeldet (${status}). Bitte schau ins Add-On-Log für Details.`;
   }

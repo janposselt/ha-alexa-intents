@@ -7,6 +7,7 @@
 
 const axios = require('axios');
 const { formatDateISO } = require('../utils/date');
+const MEALPLAN_ENDPOINTS = ['/api/groups/mealplans', '/api/households/mealplans'];
 
 /**
  * Creates a pre-configured axios instance for the Mealie API.
@@ -25,6 +26,40 @@ function createClient(config) {
 }
 
 /**
+ * Performs a request against known meal plan endpoints and falls back on 404.
+ *
+ * @param {import('axios').AxiosInstance} client
+ * @param {'get'|'post'} method
+ * @param {object} options
+ * @returns {Promise<import('axios').AxiosResponse>}
+ */
+async function requestMealPlan(client, method, options) {
+  let lastError;
+  for (const endpoint of MEALPLAN_ENDPOINTS) {
+    try {
+      const response = await client.request({
+        method,
+        url: endpoint,
+        ...options,
+      });
+      return response;
+    } catch (err) {
+      err.mealieEndpoint = endpoint;
+      if (err.response?.status === 404) {
+        lastError = err;
+        continue;
+      }
+      throw err;
+    }
+  }
+
+  if (lastError) {
+    lastError.mealieEndpointCandidates = MEALPLAN_ENDPOINTS;
+    throw lastError;
+  }
+}
+
+/**
  * Retrieves the meal plan entries for a specific date.
  *
  * @param {object} config
@@ -34,7 +69,7 @@ function createClient(config) {
 async function getMealPlan(config, date) {
   const client = createClient(config);
   const dateStr = formatDateISO(date);
-  const response = await client.get('/api/groups/mealplans', {
+  const response = await requestMealPlan(client, 'get', {
     params: {
       start_date: dateStr,
       end_date: dateStr,
@@ -85,7 +120,7 @@ async function createMealPlan(config, date, recipeId, title) {
   } else {
     body.title = title;
   }
-  const response = await client.post('/api/groups/mealplans', body);
+  const response = await requestMealPlan(client, 'post', { data: body });
   return response.data;
 }
 
