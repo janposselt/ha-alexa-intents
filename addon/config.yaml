@@ -12,8 +12,8 @@ arch:
   - i386
 options:
   port: 3030
-  mealie_host: "http://localhost:9000"
-  mealie_token: ""
+  google_access_token: ""
+  google_client_id: ""
 schema:
   port: int
   mealie_host: str

@@ -4,10 +4,6 @@
       "invocationName": "ein orakel",
       "intents": [
         {
-          "name": "AMAZON.StopIntent",
-          "samples": []
-        },
-        {
           "name": "AMAZON.CancelIntent",
           "samples": []
         },
@@ -16,15 +12,15 @@
           "samples": []
         },
         {
-          "name": "AMAZON.YesIntent",
+          "name": "AMAZON.StopIntent",
           "samples": []
         },
         {
-          "name": "AMAZON.NoIntent",
+          "name": "AMAZON.NavigateHomeIntent",
           "samples": []
         },
         {
-          "name": "MealPlanned",
+          "name": "GetMealForDateIntent",
           "slots": [
             {
               "name": "date",
@@ -32,40 +28,16 @@
             }
           ],
           "samples": [
-            "Was gibt es {date}",
-            "Was steht {date} auf dem Essensplan",
-            "Was ist für {date} geplant",
-            "Was essen wir {date}",
-            "Zeig mir den Essensplan für {date}",
-            "Was es {date} zu essen gibt",
-            "Was es {date} zu essen geplant ist",
-            "Was wir {date} essen"
+            "was gibt es {date} zu essen",
+            "was essen wir {date}",
+            "was steht {date} auf dem speiseplan",
+            "welches essen ist für {date} geplant",
+            "was kochen wir {date}",
+            "was gibt es am {date} zum essen"
           ]
         },
         {
-          "name": "MealPlanAdd",
-          "slots": [
-            {
-              "name": "receipt",
-              "type": "DIALOG_TEXT_INPUT"
-            },
-            {
-              "name": "date",
-              "type": "AMAZON.DATE"
-            }
-          ],
-          "samples": [
-            "Trage {receipt} für {date} ein",
-            "Trage für {date} {receipt} ein",
-            "{date} gibt es {receipt}",
-            "Am {date} gibt es {receipt}",
-            "Setze {date} {receipt}",
-            "Setze {receipt} für {date}",
-            "Füge {receipt} für {date} hinzu"
-          ]
-        },
-        {
-          "name": "MealPlanDelete",
+          "name": "ReadMealPlanFromDateIntent",
           "slots": [
             {
               "name": "date",
@@ -73,303 +45,16 @@
             }
           ],
           "samples": [
-            "Lösche den Essensplan für {date}",
-            "Entferne den Essensplan für {date}",
-            "Streiche den Essensplan für {date}"
-          ]
-        },
-        {
-          "name": "MealPlanNextDays",
-          "slots": [
-            {
-              "name": "days",
-              "type": "AMAZON.NUMBER"
-            }
-          ],
-          "samples": [
-            "Lies den Essensplan für die nächsten {days} Tage vor",
-            "Was gibt es in den nächsten {days} Tagen",
-            "Essensplan für {days} Tage"
-          ]
-        },
-        {
-          "name": "MealPlanDialogChoice",
-          "slots": [
-            {
-              "name": "choice",
-              "type": "MEALPLAN_DIALOG_ACTION"
-            }
-          ],
-          "samples": [
-            "{choice}",
-            "Ich möchte {choice}",
-            "Bitte {choice}"
-          ]
-        },
-        {
-          "name": "MealPlanDialogRetryRecipe",
-          "slots": [
-            {
-              "name": "receipt",
-              "type": "DIALOG_TEXT_INPUT"
-            }
-          ],
-          "samples": [
-            "Suche {receipt}",
-            "Nimm {receipt}",
-            "Suche nach {receipt}"
-          ]
-        },
-        {
-          "name": "DialogTextInput",
-          "slots": [
-            {
-              "name": "query",
-              "type": "DIALOG_TEXT_INPUT"
-            }
-          ],
-          "samples": [
-            "{query}"
-          ]
-        },
-        {
-          "name": "CreateRecipe",
-          "samples": [
-            "Lege ein neues Rezept in Mealie an",
-            "Erstelle ein neues Rezept in Mealie",
-            "Neues Rezept in Mealie anlegen",
-            "Neues Rezept anlegen",
-            "Lege ein neues Rezept an",
-            "Erstelle ein Rezept"
-          ]
-        },
-        {
-          "name": "MealPlanCreate",
-          "slots": [
-            {
-              "name": "date",
-              "type": "AMAZON.DATE"
-            }
-          ],
-          "samples": [
-            "Erstelle mir einen Essensplan ab {date}",
-            "Plane den Essensplan ab {date}",
-            "Neuer Essensplan ab {date}",
-            "Essensplan erstellen ab {date}",
-            "Starte die Essensplanung ab {date}"
-          ]
-        },
-        {
-          "name": "ShoppingListRead",
-          "slots": [
-            {
-              "name": "date",
-              "type": "AMAZON.DATE"
-            }
-          ],
-          "samples": [
-            "Lese mir die Einkaufsliste ab {date} vor",
-            "Lies die Einkaufsliste ab {date} vor",
-            "Einkaufsliste ab {date} vorlesen",
-            "Was brauche ich ab {date}",
-            "Zutaten ab {date} vorlesen"
+            "lies den essensplan ab {date} vor",
+            "lies mir den speiseplan ab {date} vor",
+            "sage mir den essensplan ab {date}",
+            "was gibt es ab {date} zu essen",
+            "welche gerichte stehen ab {date} im plan",
+            "lies den plan ab {date} vor"
           ]
         }
       ],
-      "types": [
-        {
-          "name": "MEALPLAN_DIALOG_ACTION",
-          "values": [
-            {
-              "name": {
-                "value": "Notiz erstellen",
-                "synonyms": [
-                  "Notiz",
-                  "Notiz anlegen",
-                  "Notiz machen",
-                  "als Notiz",
-                  "Notiz speichern"
-                ]
-              }
-            },
-            {
-              "name": {
-                "value": "anderes Rezept suchen",
-                "synonyms": [
-                  "anderes Rezept",
-                  "ein anderes Rezept",
-                  "suche anderes Rezept",
-                  "neues Rezept suchen",
-                  "erneut suchen",
-                  "neu suchen"
-                ]
-              }
-            },
-            {
-              "name": {
-                "value": "neues Rezept erstellen",
-                "synonyms": [
-                  "Rezept erstellen",
-                  "Rezept anlegen",
-                  "neues Rezept anlegen",
-                  "ein neues Rezept erstellen"
-                ]
-              }
-            },
-            {
-              "name": {
-                "value": "Fertig",
-                "synonyms": [
-                  "bin fertig",
-                  "ich bin fertig",
-                  "das wars",
-                  "fertig mit Zutaten",
-                  "keine weiteren Zutaten"
-                ]
-              }
-            },
-            {
-              "name": {
-                "value": "korrigieren",
-                "synonyms": [
-                  "letzte Zutat korrigieren",
-                  "letzte Eingabe korrigieren",
-                  "rückgängig",
-                  "letzte Zutat entfernen"
-                ]
-              }
-            },
-            {
-              "name": {
-                "value": "abbrechen",
-                "synonyms": [
-                  "Abbruch",
-                  "stop",
-                  "stopp"
-                ]
-              }
-            },
-            {
-              "name": {
-                "value": "weiter",
-                "synonyms": [
-                  "nächster Tag",
-                  "nächste",
-                  "ok",
-                  "okay",
-                  "bestätigen"
-                ]
-              }
-            },
-            {
-              "name": {
-                "value": "überspringen",
-                "synonyms": [
-                  "diesen Tag überspringen",
-                  "Tag überspringen",
-                  "skip"
-                ]
-              }
-            },
-            {
-              "name": {
-                "value": "ersetzen",
-                "synonyms": [
-                  "ersetzen und neu eingeben",
-                  "löschen und neu",
-                  "ändern"
-                ]
-              }
-            },
-            {
-              "name": {
-                "value": "hinzufügen",
-                "synonyms": [
-                  "behalten und hinzufügen",
-                  "noch etwas hinzufügen",
-                  "weiteres Gericht hinzufügen"
-                ]
-              }
-            },
-            {
-              "name": {
-                "value": "speichern",
-                "synonyms": [
-                  "beenden und speichern",
-                  "Essensplanung beenden",
-                  "Essensplan speichern",
-                  "Plan speichern"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "DIALOG_TEXT_INPUT",
-          "values": [
-            {
-              "name": {
-                "value": "Pommes mit Bratrolle"
-              }
-            },
-            {
-              "name": {
-                "value": "2 Bratrollen"
-              }
-            },
-            {
-              "name": {
-                "value": "750 Gramm Pommes"
-              }
-            },
-            {
-              "name": {
-                "value": "Spaghetti Carbonara"
-              }
-            },
-            {
-              "name": {
-                "value": "1 Zwiebel"
-              }
-            },
-            {
-              "name": {
-                "value": "200 Milliliter Sahne"
-              }
-            },
-            {
-              "name": {
-                "value": "Kartoffelsalat"
-              }
-            },
-            {
-              "name": {
-                "value": "3 Eier"
-              }
-            },
-            {
-              "name": {
-                "value": "rote Paprika"
-              }
-            },
-            {
-              "name": {
-                "value": "frische Petersilie"
-              }
-            },
-            {
-              "name": {
-                "value": "Lasagne"
-              }
-            },
-            {
-              "name": {
-                "value": "eine Packung Nudeln"
-              }
-            }
-          ]
-        }
-      ]
+      "types": []
     }
   }
 }
