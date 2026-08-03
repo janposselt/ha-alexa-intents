@@ -4,6 +4,7 @@ const { ExpressAdapter } = require('ask-sdk-express-adapter');
 const Alexa = require('ask-sdk-core');
 const { google } = require('googleapis');
 
+
 // ====================================================================
 // 1. Google Tasks API Hilfsfunktionen
 // ====================================================================
@@ -55,7 +56,7 @@ const GetMealForDateIntentHandler = {
     //const accessToken = Alexa.getAccessToken(handlerInput.requestEnvelope);
     const accessToken = handlerInput.requestEnvelope.context.System.user.accessToken;
     if (!accessToken) return handleMissingToken(handlerInput);
-
+printAllTaskLists(accessToken); // Debug: Alle Tasklisten ausgeben
     const dateSlot = Alexa.getSlotValue(handlerInput.requestEnvelope, 'date');
     const targetDateStr = dateSlot || new Date().toISOString().split('T')[0];
 
@@ -88,7 +89,6 @@ const ReadMealPlanFromDateIntentHandler = {
       && Alexa.getIntentName(handlerInput.requestEnvelope) === 'ReadMealPlanFromDateIntent';
   },
   async handle(handlerInput) {
-    //const accessToken = Alexa.getAccessToken(handlerInput.requestEnvelope);
     const accessToken = handlerInput.requestEnvelope.context.System.user.accessToken;
     if (!accessToken) return handleMissingToken(handlerInput);
 
@@ -175,6 +175,19 @@ function handleMissingToken(handlerInput) {
     .speak('Bitte verknüpfe zuerst dein Google-Konto in der Alexa App.')
     .withLinkAccountCard()
     .getResponse();
+}
+
+async function printAllTaskLists(accessToken) {
+  const auth = getOAuth2Client(accessToken);
+  const tasks = google.tasks({ version: 'v1', auth });
+
+  const response = await tasks.tasklists.list();
+  const taskLists = response.data.items || [];
+
+  console.log('--- Deine Google Tasks Listen ---');
+  taskLists.forEach(list => {
+    console.log(`Titel: "${list.title}"  ==>  ID: "${list.id}"`);
+  });
 }
 
 // ====================================================================
