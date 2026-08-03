@@ -16,8 +16,8 @@ options:
   google_client_id: ""
 schema:
   port: int
-  mealie_host: str
-  mealie_token: str
+  google_access_token: str
+  google_client_id: str
 ports:
   3030/tcp: 3030
 ports_description:

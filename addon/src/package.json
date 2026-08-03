@@ -12,11 +12,7 @@
   "dependencies": {
     "ask-sdk-core": "^2.14.0",
     "ask-sdk-express-adapter": "^2.14.0",
-    "axios": "1.18.0",
-    "express": "^4.22.2",
-    "googleapis": "^173.0.0"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+    "express": "^4.19.2",
+    "googleapis": "^140.0.0"
+  }
 }
