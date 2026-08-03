@@ -3,7 +3,7 @@ const express = require('express');
 const { ExpressAdapter } = require('ask-sdk-express-adapter');
 const Alexa = require('ask-sdk-core');
 const { google } = require('googleapis');
-
+const LIST_ID = 'QXFMU1ZHSjBSR19FVlZkcA';
 
 // ====================================================================
 // 1. Google Tasks API Hilfsfunktionen
@@ -24,7 +24,7 @@ async function getTasks(accessToken) {
   const tasks = google.tasks({ version: 'v1', auth });
 
   const response = await tasks.tasks.list({
-    tasklist: '@default',
+    tasklist: LIST_ID,
     showCompleted: false,
   });
 
