@@ -1,6 +1,6 @@
 name: "HA Alexa Intents"
 description: "Generic Alexa Skill Intent Handler – antwortet auf beliebige Alexa-Intents über eine erweiterbare Registry"
-version: "1.0.0"
+version: "1.0.1"
 slug: "ha_alexa_intents"
 url: "https://github.com/janposselt/ha-alexa-intents"
 init: false

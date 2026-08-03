@@ -52,7 +52,8 @@ const GetMealForDateIntentHandler = {
       && Alexa.getIntentName(handlerInput.requestEnvelope) === 'GetMealForDateIntent';
   },
   async handle(handlerInput) {
-    const accessToken = Alexa.getAccessToken(handlerInput.requestEnvelope);
+    //const accessToken = Alexa.getAccessToken(handlerInput.requestEnvelope);
+    const accessToken = handlerInput.requestEnvelope.context.System.user.accessToken;
     if (!accessToken) return handleMissingToken(handlerInput);
 
     const dateSlot = Alexa.getSlotValue(handlerInput.requestEnvelope, 'date');
