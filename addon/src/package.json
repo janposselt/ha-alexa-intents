@@ -1,6 +1,6 @@
 {
   "name": "ha-alexa-intents",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Home Assistant Add-On: Generic Alexa Intent Handler",
   "main": "index.js",
   "engines": {
